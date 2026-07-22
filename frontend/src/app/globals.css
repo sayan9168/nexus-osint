@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --nexus-bg: #0a0e1a;
+  --nexus-surface: #111827;
+  --nexus-border: #1f2937;
+  --nexus-accent: #06b6d4;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--nexus-bg);
+  color: #e5e7eb;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow: hidden;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--nexus-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--nexus-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--nexus-accent);
+}
+
+/* 3D Graph container */
+.graph-container {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+}
+
+.graph-container canvas {
+  outline: none !important;
+}

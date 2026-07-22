@@ -1,0 +1,155 @@
+# ═══════════════════════════════════════════════════════════════
+# NEXUS-OSINT — .gitignore
+# ═══════════════════════════════════════════════════════════════
+
+# ─── Environment & Secrets ───
+.env
+.env.local
+.env.production
+.env.staging
+*.pem
+*.key
+*.cert
+*.p12
+secrets/
+credentials/
+
+# ─── Python ───
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+*.whl
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.manifest
+*.spec
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+ENV/
+
+# Testing
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+
+# Jupyter
+.ipynb_checkpoints
+
+# ─── Node.js / Frontend ───
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Next.js
+.next/
+out/
+.vercel
+
+# Build artifacts
+*.tsbuildinfo
+next-env.d.ts
+
+# ─── Docker ───
+docker-compose.override.yml
+*.dockerignore
+
+# ─── IDE & Editors ───
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# ─── OS Files ───
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# ─── Logs ───
+logs/
+*.log
+celerybeat-schedule
+celerybeat.pid
+
+# ─── Database Files ───
+*.db
+*.sqlite
+*.sqlite3
+
+# ─── Temporary Files ───
+tmp/
+temp/
+*.tmp
+*.bak
+*.orig
+
+# ─── Qdrant / Memgraph Data ───
+qdrant_storage/
+memgraph_data/
+
+# ─── AI / ML Models ───
+models/
+*.onnx
+*.pt
+*.pth
+*.bin
+*.safetensors
+sentence-transformers/
+
+# ─── Misc ───
+*.pid
+*.seed
+*.pid.lock
+.lock-wscript
+node_modules/
+jspm_packages/
+bower_components/
+web_modules/
+
+# Archives
+*.zip
+*.tar.gz
+*.rar
+*.7z

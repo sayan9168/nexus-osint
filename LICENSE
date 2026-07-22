@@ -1,0 +1,244 @@
+═══════════════════════════════════════════════════════════════════════
+
+                    SAYANOX LICENSE
+                       Version 1.1
+
+              Copyright (c) 2026 Sayan (sayan9168)
+
+═══════════════════════════════════════════════════════════════════════
+
+
+PREAMBLE
+────────
+
+The Sayanox License v1.1 ("License") governs the use, modification,
+and distribution of the software project known as "NEXUS-OSINT"
+("Software"), created and maintained by Sayan ("Author").
+
+By accessing, copying, modifying, or distributing this Software,
+you ("Licensee") agree to be bound by the terms and conditions
+set forth in this License.
+
+
+ARTICLE 1 — DEFINITIONS
+────────────────────────
+
+1.1  "Software" refers to the NEXUS-OSINT platform, including all
+     source code, documentation, configuration files, Docker
+     definitions, and associated assets contained within the
+     original repository.
+
+1.2  "Author" refers to Sayan, reachable at:
+       - GitHub:    https://github.com/sayan9168
+       - Twitter:   https://twitter.com/notfound_sayan
+       - Instagram: https://instagram.com/_sayyyyan
+       - Email:     sm6881164@gmail.com
+
+1.3  "Licensee" refers to any individual or entity that accesses,
+     uses, modifies, or distributes the Software.
+
+1.4  "Derivative Work" refers to any modification, adaptation,
+     translation, or extension of the Software.
+
+1.5  "Commercial Use" refers to any use of the Software intended
+     for or directed toward commercial advantage or monetary
+     compensation.
+
+
+ARTICLE 2 — GRANT OF RIGHTS
+────────────────────────────
+
+2.1  PERMISSION TO USE.
+     The Author grants the Licensee a non-exclusive, worldwide,
+     royalty-free permission to use the Software for personal,
+     educational, research, and non-commercial purposes.
+
+2.2  PERMISSION TO MODIFY.
+     The Licensee may modify, adapt, or extend the Software for
+     personal use, provided that all modifications comply with
+     the terms of this License.
+
+2.3  PERMISSION TO DISTRIBUTE.
+     The Licensee may distribute unmodified copies of the Software
+     freely, provided that:
+       (a) This License file is included in its entirety;
+       (b) All original copyright notices are preserved;
+       (c) The Author is clearly credited.
+
+2.4  PERMISSION FOR DERIVATIVE WORKS.
+     The Licensee may create and distribute Derivative Works,
+     provided that:
+       (a) The Derivative Work is clearly marked as modified;
+       (b) This License (Sayanox License v1.1) is applied to the
+           Derivative Work;
+       (c) The original Author is credited in the documentation;
+       (d) A notice of modification is included.
+
+
+ARTICLE 3 — RESTRICTIONS
+─────────────────────────
+
+3.1  NO COMMERCIAL USE WITHOUT CONSENT.
+     The Software shall NOT be used for Commercial Use without
+     prior written consent from the Author. Licensees seeking
+     commercial licensing must contact the Author at:
+       Email: sm6881164@gmail.com
+
+3.2  NO REMOVAL OF ATTRIBUTION.
+     The Licensee shall NOT remove, alter, or obscure any
+     copyright notices, author attributions, or license
+     information contained within the Software.
+
+3.3  NO MISREPRESENTATION.
+     The Licensee shall NOT misrepresent the origin of the
+     Software or claim authorship of the original work.
+
+3.4  NO MALICIOUS USE.
+     The Software shall NOT be used for any unlawful, harmful,
+     or malicious purposes including but not limited to:
+       (a) Unauthorized surveillance or stalking;
+       (b) Violation of privacy laws or data protection
+           regulations (GDPR, CCPA, etc.);
+       (c) Development of weapons or harmful tools;
+       (d) Any activity that violates applicable local,
+           national, or international law.
+
+3.5  NO SUBLICENSING.
+     The Licensee shall NOT sublicense the Software to third
+     parties under different terms without written permission
+     from the Author.
+
+
+ARTICLE 4 — ATTRIBUTION REQUIREMENTS
+─────────────────────────────────────
+
+4.1  All distributions of the Software or Derivative Works must
+     include the following attribution:
+
+       "NEXUS-OSINT — AI-Native OSINT & 3D Link Analysis Platform
+        Copyright (c) 2026 Sayan (sayan9168)
+        Licensed under the Sayanox License v1.1
+        https://github.com/sayan9168/nexus-osint"
+
+4.2  In any public-facing use, presentation, or publication
+     involving the Software, the Author must be credited as:
+
+       "Built with NEXUS-OSINT by Sayan (@notfound_sayan)"
+
+
+ARTICLE 5 — DISCLAIMER OF WARRANTY
+───────────────────────────────────
+
+5.1  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
+     KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+     WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+     PURPOSE, AND NONINFRINGEMENT.
+
+5.2  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM,
+     DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+     CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN
+     CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+     IN THE SOFTWARE.
+
+5.3  THE AUTHOR DOES NOT WARRANT THAT THE SOFTWARE IS FREE FROM
+     ERRORS, BUGS, OR SECURITY VULNERABILITIES. THE LICENSEE
+     ASSUMES ALL RISK ASSOCIATED WITH THE USE OF THE SOFTWARE.
+
+
+ARTICLE 6 — LIMITATION OF LIABILITY
+────────────────────────────────────
+
+6.1  THE AUTHOR SHALL NOT BE LIABLE FOR ANY DIRECT, INDIRECT,
+     INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR EXEMPLARY DAMAGES
+     ARISING FROM THE USE OR INABILITY TO USE THE SOFTWARE.
+
+6.2  THE LICENSEE ACKNOWLEDGES THAT OSINT TOOLS MAY ACCESS
+     PUBLICLY AVAILABLE DATA AND THAT THE LICENSEE IS SOLELY
+     RESPONSIBLE FOR ENSURING COMPLIANCE WITH ALL APPLICABLE
+     LAWS AND REGULATIONS IN THEIR JURISDICTION.
+
+
+ARTICLE 7 — TERMINATION
+────────────────────────
+
+7.1  This License is effective until terminated.
+
+7.2  The License shall terminate automatically if the Licensee
+     fails to comply with any term or condition of this License.
+
+7.3  Upon termination, the Licensee must cease all use of the
+     Software and destroy all copies in their possession.
+
+7.4  The Author reserves the right to revoke this License for
+     any Licensee who engages in malicious, unlawful, or
+     unethical use of the Software.
+
+
+ARTICLE 8 — INTELLECTUAL PROPERTY
+──────────────────────────────────
+
+8.1  All intellectual property rights in the original Software
+     remain with the Author.
+
+8.2  This License does NOT transfer ownership of the Software
+     to the Licensee.
+
+8.3  Contributions made to the Software via pull requests or
+     other means shall be governed by the terms of this License
+     unless otherwise agreed in writing.
+
+
+ARTICLE 9 — GOVERNING LAW
+──────────────────────────
+
+9.1  This License shall be governed by and construed in
+     accordance with the laws of India.
+
+9.2  Any disputes arising under this License shall be subject
+     to the exclusive jurisdiction of the courts in India.
+
+
+ARTICLE 10 — AMENDMENTS
+────────────────────────
+
+10.1 The Author reserves the right to modify or update this
+     License at any time.
+
+10.2 Any changes to this License will be indicated by a version
+     number update (e.g., v1.2, v2.0).
+
+10.3 Continued use of the Software after license modifications
+     constitutes acceptance of the updated terms.
+
+
+ARTICLE 11 — SEVERABILITY
+──────────────────────────
+
+11.1 If any provision of this License is found to be invalid
+     or unenforceable, the remaining provisions shall continue
+     in full force and effect.
+
+
+ARTICLE 12 — ENTIRE AGREEMENT
+──────────────────────────────
+
+12.1 This License constitutes the entire agreement between the
+     Author and the Licensee regarding the use of the Software.
+
+
+═══════════════════════════════════════════════════════════════════════
+
+CONTACT INFORMATION
+───────────────────
+
+  Author:     Sayan
+  GitHub:     https://github.com/sayan9168
+  Twitter:    https://twitter.com/notfound_sayan
+  Instagram:  https://instagram.com/_sayyyyan
+  Email:      sm6881164@gmail.com
+
+═══════════════════════════════════════════════════════════════════════
+
+                    END OF SAYANOX LICENSE v1.1
+
+═══════════════════════════════════════════════════════════════════════
