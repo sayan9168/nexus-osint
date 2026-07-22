@@ -1,662 +1,314 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sayanox Enterprises Private Limited | Next-Gen Cybersecurity & AI Solutions</title>
-    <meta name="description" content="Sayanox Enterprises Private Limited - Pioneering AI-Native Cybersecurity, OSINT Intelligence, and 3D Threat Analysis Solutions.">
-    <meta name="author" content="Sayan - Sayanox Private Limited">
-    <meta name="keywords" content="Sayanox, Cybersecurity, AI, OSINT, Threat Intelligence, 3D Analysis, Sayanox Private Limited">
-    
-    <!-- Open Graph -->
-    <meta property="og:title" content="Sayanox Enterprises Private Limited">
-    <meta property="og:description" content="Next-Gen AI-Native Cybersecurity & 3D Link Analysis Platform">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://sayanox-enterprises-private-limited.vercel.app">
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Three.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
-    <style>
-        /* ═══════════════════════════════════════════════════════════
-           SAYANOX ENTERPRISES PRIVATE LIMITED — 3D WEBSITE STYLES
-           ═══════════════════════════════════════════════════════════ */
-
-        :root {
-            --primary: #00f0ff;
-            --primary-dim: #00a8b3;
-            --secondary: #7b2fff;
-            --accent: #ff006e;
-            --success: #00ff88;
-            --warning: #ffbe0b;
-            --bg-dark: #020810;
-            --bg-surface: #0a1628;
-            --bg-card: #0d1f3c;
-            --bg-elevated: #132a4a;
-            --text-primary: #e8f4f8;
-            --text-secondary: #8ba4b8;
-            --text-muted: #4a6a80;
-            --border: #1a3a5c;
-            --glow-primary: 0 0 20px rgba(0, 240, 255, 0.3);
-            --glow-secondary: 0 0 20px rgba(123, 47, 255, 0.3);
-            --glow-accent: 0 0 20px rgba(255, 0, 110, 0.3);
-            --font-display: 'Orbitron', sans-serif;
-            --font-heading: 'Rajdhani', sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
-            --font-body: 'Inter', sans-serif;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-            scrollbar-width: thin;
-            scrollbar-color: var(--primary-dim) var(--bg-dark);
-        }
-
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: var(--bg-dark); }
-        ::-webkit-scrollbar-thumb { background: var(--primary-dim); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
-
-        body {
-            font-family: var(--font-body);
-            background: var(--bg-dark);
-            color: var(--text-primary);
-            overflow-x: hidden;
-            line-height: 1.6;
-        }
-
-        /* ─── 3D Canvas Background ─── */
-        #bg-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        /* ─── Navigation ─── */
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            padding: 1rem 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(2, 8, 16, 0.85);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0, 240, 255, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .navbar.scrolled {
-            padding: 0.6rem 2rem;
-            background: rgba(2, 8, 16, 0.95);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-        }
-
-        .nav-logo {
-            width: 42px;
-            height: 42px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: var(--font-display);
-            font-weight: 900;
-            font-size: 18px;
-            color: var(--bg-dark);
-            transform: perspective(500px) rotateY(-5deg);
-            transition: transform 0.3s ease;
-            box-shadow: var(--glow-primary);
-        }
-
-        .nav-brand:hover .nav-logo {
-            transform: perspective(500px) rotateY(5deg) scale(1.05);
-        }
-
-        .nav-title {
-            font-family: var(--font-display);
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            letter-spacing: 1px;
-        }
-
-        .nav-title span {
-            color: var(--primary);
-        }
-
-        .nav-subtitle {
-            font-size: 0.6rem;
-            color: var(--text-muted);
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            font-family: var(--font-mono);
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-            transition: all 0.3s ease;
-            position: relative;
-            padding: 0.5rem 0;
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--primary);
-            transition: width 0.3s ease;
-            box-shadow: var(--glow-primary);
-        }
-
-        .nav-links a:hover {
-            color: var(--primary);
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-        .nav-cta {
-            padding: 0.6rem 1.5rem;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: var(--bg-dark) !important;
-            border-radius: 6px;
-            font-weight: 700 !important;
-            font-size: 0.8rem !important;
-            letter-spacing: 1px;
-            transition: all 0.3s ease !important;
-            box-shadow: var(--glow-primary);
-        }
-
-        .nav-cta::after { display: none !important; }
-
-        .nav-cta:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(0, 240, 255, 0.4);
-        }
-
-        .mobile-toggle {
-            display: none;
-            flex-direction: column;
-            gap: 5px;
-            cursor: pointer;
-            padding: 5px;
-        }
-
-        .mobile-toggle span {
-            width: 25px;
-            height: 2px;
-            background: var(--primary);
-            transition: all 0.3s ease;
-        }
-
-        /* ─── Hero Section ─── */
-        .hero {
-            position: relative;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 120px 2rem 80px;
-            z-index: 1;
-            perspective: 1000px;
-        }
-
-        .hero-content {
-            text-align: center;
-            max-width: 900px;
-            transform-style: preserve-3d;
-            animation: heroFloat 6s ease-in-out infinite;
-        }
-
-        @keyframes heroFloat {
-            0%, 100% { transform: translateY(0) rotateX(0deg); }
-            50% { transform: translateY(-15px) rotateX(1deg); }
-        }
-
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 0.5rem 1.2rem;
-            background: rgba(0, 240, 255, 0.08);
-            border: 1px solid rgba(0, 240, 255, 0.2);
-            border-radius: 50px;
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            color: var(--primary);
-            letter-spacing: 2px;
-            margin-bottom: 2rem;
-            animation: pulse-border 3s ease-in-out infinite;
-        }
-
-        @keyframes pulse-border {
-            0%, 100% { border-color: rgba(0, 240, 255, 0.2); }
-            50% { border-color: rgba(0, 240, 255, 0.6); }
-        }
-
-        .hero-badge .dot {
-            width: 6px;
-            height: 6px;
-            background: var(--success);
-            border-radius: 50%;
-            animation: blink 1.5s ease-in-out infinite;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-
-        .hero-title {
-            font-family: var(--font-display);
-            font-size: clamp(2.5rem, 6vw, 4.5rem);
-            font-weight: 900;
-            line-height: 1.1;
-            margin-bottom: 1.5rem;
-            background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary) 50%, var(--secondary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: none;
-        }
-
-        .hero-subtitle {
-            font-family: var(--font-heading);
-            font-size: clamp(1.1rem, 2.5vw, 1.5rem);
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-            font-weight: 400;
-        }
-
-        .hero-description {
-            font-size: 1rem;
-            color: var(--text-muted);
-            max-width: 650px;
-            margin: 0 auto 2.5rem;
-            line-height: 1.8;
-        }
-
-        .hero-buttons {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        .btn-primary {
-            padding: 1rem 2.5rem;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: var(--bg-dark);
-            border: none;
-            border-radius: 8px;
-            font-family: var(--font-heading);
-            font-size: 1rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: var(--glow-primary);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 12px 40px rgba(0, 240, 255, 0.4);
-        }
-
-        .btn-secondary {
-            padding: 1rem 2.5rem;
-            background: transparent;
-            color: var(--primary);
-            border: 1px solid var(--primary);
-            border-radius: 8px;
-            font-family: var(--font-heading);
-            font-size: 1rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(0, 240, 255, 0.08);
-            transform: translateY(-3px);
-            box-shadow: var(--glow-primary);
-        }
-
-        .hero-stats {
-            display: flex;
-            justify-content: center;
-            gap: 3rem;
-            margin-top: 4rem;
-            padding-top: 3rem;
-            border-top: 1px solid rgba(0, 240, 255, 0.1);
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-value {
-            font-family: var(--font-display);
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--primary);
-            text-shadow: var(--glow-primary);
-        }
-
-        .stat-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-top: 0.3rem;
-        }
-
-        /* ─── Section Styles ─── */
-        .section {
-            position: relative;
-            z-index: 1;
-            padding: 100px 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 4rem;
-        }
-
-        .section-tag {
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            color: var(--primary);
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin-bottom: 1rem;
-            display: block;
-        }
-
-        .section-title {
-            font-family: var(--font-display);
-            font-size: clamp(1.8rem, 4vw, 2.8rem);
-            font-weight: 800;
-            margin-bottom: 1rem;
-            color: var(--text-primary);
-        }
-
-        .section-desc {
-            font-size: 1rem;
-            color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* ─── 3D Cards Grid ─── */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 2rem;
-            perspective: 1000px;
-        }
-
-        .card-3d {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 2.5rem;
-            transition: all 0.4s ease;
-            transform-style: preserve-3d;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .card-3d::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .card-3d:hover {
-            transform: translateY(-10px) rotateX(5deg) rotateY(-2deg);
-            border-color: rgba(0, 240, 255, 0.3);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), var(--glow-primary);
-        }
-
-        .card-3d:hover::before {
-            opacity: 1;
-        }
-
-        .card-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-            background: rgba(0, 240, 255, 0.08);
-            border: 1px solid rgba(0, 240, 255, 0.15);
-        }
-
-        .card-title {
-            font-family: var(--font-heading);
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin-bottom: 0.8rem;
-            color: var(--text-primary);
-        }
-
-        .card-text {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            line-height: 1.7;
-        }
-
-        .card-tag {
-            display: inline-block;
-            margin-top: 1.2rem;
-            padding: 0.3rem 0.8rem;
-            background: rgba(123, 47, 255, 0.1);
-            border: 1px solid rgba(123, 47, 255, 0.2);
-            border-radius: 4px;
-            font-family: var(--font-mono);
-            font-size: 0.7rem;
-            color: var(--secondary);
-            letter-spacing: 1px;
-        }
-
-        /* ─── About / Company Section ─── */
-        .about-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            align-items: center;
-        }
-
-        .about-visual {
-            position: relative;
-            perspective: 800px;
-        }
-
-        .about-cube {
-            width: 280px;
-            height: 280px;
-            margin: 0 auto;
-            position: relative;
-            transform-style: preserve-3d;
-            animation: rotateCube 20s linear infinite;
-        }
-
-        @keyframes rotateCube {
-            0% { transform: rotateX(0) rotateY(0); }
-            100% { transform: rotateX(360deg) rotateY(360deg); }
-        }
-
-        .cube-face {
-            position: absolute;
-            width: 280px;
-            height: 280px;
-            border: 2px solid rgba(0, 240, 255, 0.3);
-            background: rgba(0, 240, 255, 0.03);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: var(--font-display);
-            font-size: 1.2rem;
-            color: var(--primary);
-            backdrop-filter: blur(2px);
-        }
-
-        .cube-face:nth-child(1) { transform: rotateY(0deg) translateZ(140px); }
-        .cube-face:nth-child(2) { transform: rotateY(90deg) translateZ(140px); }
-        .cube-face:nth-child(3) { transform: rotateY(180deg) translateZ(140px); }
-        .cube-face:nth-child(4) { transform: rotateY(270deg) translateZ(140px); }
-        .cube-face:nth-child(5) { transform: rotateX(90deg) translateZ(140px); }
-        .cube-face:nth-child(6) { transform: rotateX(-90deg) translateZ(140px); }
-
-        .about-content h3 {
-            font-family: var(--font-display);
-            font-size: 1.8rem;
-            margin-bottom: 1.5rem;
-            color: var(--text-primary);
-        }
-
-        .about-content p {
-            color: var(--text-secondary);
-            margin-bottom: 1.5rem;
-            line-height: 1.8;
-        }
-
-        .about-list {
-            list-style: none;
-            margin-top: 1.5rem;
-        }
-
-        .about-list li {
-            padding: 0.6rem 0;
-            padding-left: 1.5rem;
-            position: relative;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .about-list li::before {
-            content: '▹';
-            position: absolute;
-            left: 0;
-            color: var(--primary);
-            font-weight: bold;
-        }
-
-        /* ─── Products Section ─── */
-        .product-card {
-            background: linear-gradient(135deg, var(--bg-card), var(--bg-elevated));
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 3rem;
-            margin-bottom: 2rem;
-            display: grid;
-            grid-template-columns: auto 1fr;
-            gap: 2rem;
-            align-items: start;
-            transition: all 0.4s ease;
-            transform-style: preserve-3d;
-        }
-
-        .product-card:hover {
-            transform: translateZ(20px) scale(1.01);
-            border-color: rgba(0, 240, 255, 0.3);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-        }
-
-        .product-icon {
-            width: 70px;
-            height: 70px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, rgba(0, 240, 255, 0.1), rgba(123, 47, 255, 0.1));
-            border: 1px solid rgba(0, 240, 255, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-        }
-
-        .product-info h3 {
-            font-family: var(--font-heading);
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .product-info p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            line-height: 1.7;
-            margin-bottom: 1rem;
-        }
-
-        .product-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        .product-tags span {
-            padding: 0.3rem 0.7rem;
-       
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sayanox Enterprises Private Limited | Next-Gen Cybersecurity & AI</title>
+<meta name="description" content="Sayanox Enterprises Private Limited - AI-Native Cybersecurity, OSINT Intelligence, 3D Threat Analysis.">
+<meta name="author" content="Sayan - Sayanox Private Limited">
+<meta property="og:title" content="Sayanox Enterprises Private Limited">
+<meta property="og:url" content="https://sayanox-enterprises-private-limited.vercel.app">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root{--p:#00f0ff;--pd:#00a8b3;--s:#7b2fff;--a:#ff006e;--g:#00ff88;--bg:#020810;--card:#0d1f3c;--el:#132a4a;--t1:#e8f4f8;--t2:#8ba4b8;--t3:#4a6a80;--bd:#1a3a5c;--gl:0 0 20px rgba(0,240,255,.3)}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);overflow-x:hidden;line-height:1.6}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--pd);border-radius:3px}
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+.grid-ov{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(0,240,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(0,240,255,.02) 1px,transparent 1px);background-size:60px 60px}
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;background:rgba(2,8,16,.85);backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,240,255,.1);transition:.3s}
+nav.sc{padding:.6rem 2rem;background:rgba(2,8,16,.95)}
+.nb{display:flex;align-items:center;gap:12px;text-decoration:none}
+.nl{width:42px;height:42px;background:linear-gradient(135deg,var(--p),var(--s));border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Orbitron';font-weight:900;font-size:18px;color:var(--bg);box-shadow:var(--gl);transform:perspective(500px) rotateY(-5deg);transition:.3s}
+.nb:hover .nl{transform:perspective(500px) rotateY(5deg) scale(1.05)}
+.nt{font-family:'Orbitron';font-size:1.1rem;font-weight:700;color:var(--t1)}.nt span{color:var(--p)}
+.ns{font-size:.6rem;color:var(--t3);letter-spacing:3px;text-transform:uppercase;font-family:'JetBrains Mono'}
+.nlinks{display:flex;align-items:center;gap:2rem;list-style:none}
+.nlinks a{color:var(--t2);text-decoration:none;font-size:.85rem;font-weight:500;transition:.3s;position:relative;padding:.5rem 0}
+.nlinks a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:2px;background:var(--p);transition:.3s}
+.nlinks a:hover{color:var(--p)}.nlinks a:hover::after{width:100%}
+.ncta{padding:.6rem 1.5rem;background:linear-gradient(135deg,var(--p),var(--s));color:var(--bg)!important;border-radius:6px;font-weight:700!important;font-size:.8rem!important}
+.ncta::after{display:none!important}.ncta:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,240,255,.4)}
+.mt{display:none;flex-direction:column;gap:5px;cursor:pointer}.mt span{width:25px;height:2px;background:var(--p)}
+.mnav{display:none;position:fixed;inset:0;z-index:999;background:rgba(2,8,16,.98);flex-direction:column;align-items:center;justify-content:center;gap:2rem}
+.mnav.act{display:flex}.mnav a{color:var(--t1);text-decoration:none;font-family:'Rajdhani';font-size:1.5rem;font-weight:600}.mnav a:hover{color:var(--p)}
+.mclose{position:absolute;top:2rem;right:2rem;font-size:2rem;color:var(--t1);cursor:pointer;background:none;border:none}
+.hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:120px 2rem 80px;z-index:1}
+.hc{text-align:center;max-width:900px;animation:hf 6s ease-in-out infinite}
+@keyframes hf{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}
+.hbadge{display:inline-flex;align-items:center;gap:8px;padding:.5rem 1.2rem;background:rgba(0,240,255,.08);border:1px solid rgba(0,240,255,.2);border-radius:50px;font-family:'JetBrains Mono';font-size:.75rem;color:var(--p);letter-spacing:2px;margin-bottom:2rem}
+.hbadge .dot{width:6px;height:6px;background:var(--g);border-radius:50%;animation:bl 1.5s infinite}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.3}}
+.htitle{font-family:'Orbitron';font-size:clamp(2.5rem,6vw,4.5rem);font-weight:900;line-height:1.1;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--t1),var(--p),var(--s));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hsub{font-family:'Rajdhani';font-size:clamp(1.1rem,2.5vw,1.5rem);color:var(--t2);margin-bottom:1rem}
+.hdesc{font-size:1rem;color:var(--t3);max-width:650px;margin:0 auto 2.5rem;line-height:1.8}
+.hbtns{display:flex;align-items:center;justify-content:center;gap:1.5rem;flex-wrap:wrap}
+.bp{padding:1rem 2.5rem;background:linear-gradient(135deg,var(--p),var(--s));color:var(--bg);border:none;border-radius:8px;font-family:'Rajdhani';font-size:1rem;font-weight:700;cursor:pointer;transition:.3s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;box-shadow:var(--gl)}
+.bp:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 12px 40px rgba(0,240,255,.4)}
+.bs{padding:1rem 2.5rem;background:transparent;color:var(--p);border:1px solid var(--p);border-radius:8px;font-family:'Rajdhani';font-size:1rem;font-weight:600;cursor:pointer;transition:.3s;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.bs:hover{background:rgba(0,240,255,.08);transform:translateY(-3px)}
+.hstats{display:flex;justify-content:center;gap:3rem;margin-top:4rem;padding-top:3rem;border-top:1px solid rgba(0,240,255,.1);flex-wrap:wrap}
+.si{text-align:center}.sv{font-family:'Orbitron';font-size:2rem;font-weight:800;color:var(--p);text-shadow:var(--gl)}
+.sl{font-size:.75rem;color:var(--t3);text-transform:uppercase;letter-spacing:2px;margin-top:.3rem}
+.sec{position:relative;z-index:1;padding:100px 2rem;max-width:1200px;margin:0 auto}
+.sh{text-align:center;margin-bottom:4rem}
+.stag{font-family:'JetBrains Mono';font-size:.75rem;color:var(--p);letter-spacing:3px;text-transform:uppercase;margin-bottom:1rem;display:block}
+.stitle{font-family:'Orbitron';font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;margin-bottom:1rem}
+.sdesc{font-size:1rem;color:var(--t2);max-width:600px;margin:0 auto}
+.cg{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem;perspective:1000px}
+.c3{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:2.5rem;transition:.4s;transform-style:preserve-3d;position:relative;overflow:hidden}
+.c3::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--p),var(--s),var(--a));opacity:0;transition:.3s}
+.c3:hover{transform:translateY(-10px) rotateX(5deg) rotateY(-2deg);border-color:rgba(0,240,255,.3);box-shadow:0 20px 60px rgba(0,0,0,.5),var(--gl)}
+.c3:hover::before{opacity:1}
+.ci{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:1.5rem;background:rgba(0,240,255,.08);border:1px solid rgba(0,240,255,.15)}
+.ct{font-family:'Rajdhani';font-size:1.3rem;font-weight:700;margin-bottom:.8rem}
+.cx{font-size:.9rem;color:var(--t2);line-height:1.7}
+.ctag{display:inline-block;margin-top:1.2rem;padding:.3rem .8rem;background:rgba(123,47,255,.1);border:1px solid rgba(123,47,255,.2);border-radius:4px;font-family:'JetBrains Mono';font-size:.7rem;color:var(--s)}
+.ag{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+.av{position:relative;perspective:800px}
+.acube{width:250px;height:250px;margin:0 auto;position:relative;transform-style:preserve-3d;animation:rc 20s linear infinite}
+@keyframes rc{from{transform:rotateX(0) rotateY(0)}to{transform:rotateX(360deg) rotateY(360deg)}}
+.cf{position:absolute;width:250px;height:250px;border:2px solid rgba(0,240,255,.3);background:rgba(0,240,255,.03);display:flex;align-items:center;justify-content:center;font-family:'Orbitron';font-size:1.1rem;color:var(--p)}
+.cf:nth-child(1){transform:rotateY(0) translateZ(125px)}.cf:nth-child(2){transform:rotateY(90deg) translateZ(125px)}
+.cf:nth-child(3){transform:rotateY(180deg) translateZ(125px)}.cf:nth-child(4){transform:rotateY(270deg) translateZ(125px)}
+.cf:nth-child(5){transform:rotateX(90deg) translateZ(125px)}.cf:nth-child(6){transform:rotateX(-90deg) translateZ(125px)}
+.ac h3{font-family:'Orbitron';font-size:1.8rem;margin-bottom:1.5rem}
+.ac p{color:var(--t2);margin-bottom:1.5rem;line-height:1.8}
+.al{list-style:none;margin-top:1.5rem}.al li{padding:.6rem 0 .6rem 1.5rem;position:relative;color:var(--t2);font-size:.9rem}
+.al li::before{content:'\25B9';position:absolute;left:0;color:var(--p);font-weight:bold}
+.pc{background:linear-gradient(135deg,var(--card),var(--el));border:1px solid var(--bd);border-radius:20px;padding:2.5rem;margin-bottom:2rem;display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start;transition:.4s}
+.pc:hover{transform:scale(1.01);border-color:rgba(0,240,255,.3);box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.pi{width:70px;height:70px;border-radius:16px;background:linear-gradient(135deg,rgba(0,240,255,.1),rgba(123,47,255,.1));border:1px solid rgba(0,240,255,.2);display:flex;align-items:center;justify-content:center;font-size:2rem}
+.pinfo h3{font-family:'Rajdhani';font-size:1.5rem;font-weight:700;margin-bottom:.5rem}
+.pinfo p{color:var(--t2);font-size:.9rem;line-height:1.7;margin-bottom:1rem}
+.ptags{display:flex;flex-wrap:wrap;gap:.5rem}
+.ptags span{padding:.3rem .7rem;background:rgba(0,240,255,.06);border:1px solid rgba(0,240,255,.15);border-radius:4px;font-family:'JetBrains Mono';font-size:.7rem;color:var(--pd)}
+.term{background:#0a0e14;border:1px solid var(--bd);border-radius:12px;overflow:hidden;max-width:700px;margin:3rem auto 0;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.th{display:flex;align-items:center;gap:8px;padding:12px 16px;background:rgba(255,255,255,.03);border-bottom:1px solid var(--bd)}
+.td{width:12px;height:12px;border-radius:50%}.td.r{background:#ff5f57}.td.y{background:#febc2e}.td.g{background:#28c840}
+.tt{margin-left:12px;font-family:'JetBrains Mono';font-size:.75rem;color:var(--t3)}
+.tb{padding:1.5rem;font-family:'JetBrains Mono';font-size:.8rem;line-height:2;color:var(--g)}
+.tb .pr{color:var(--p)}.tb .cm{color:var(--t3)}.tb .ou{color:var(--t2)}
+.sban{background:linear-gradient(90deg,rgba(0,240,255,.05),rgba(123,47,255,.05));border:1px solid rgba(0,240,255,.1);border-radius:12px;padding:1.5rem 2rem;margin-top:3rem;display:flex;align-items:center;gap:1rem}
+.sban p{font-size:.8rem;color:var(--t3);line-height:1.6}.sban strong{color:var(--p)}
+.cong{display:grid;grid-template-columns:1fr 1fr;gap:3rem}
+.coni{display:flex;flex-direction:column;gap:1.5rem}
+.citem{display:flex;align-items:center;gap:1rem;padding:1.2rem 1.5rem;background:var(--card);border:1px solid var(--bd);border-radius:12px;transition:.3s;text-decoration:none;color:var(--t1)}
+.citem:hover{border-color:rgba(0,240,255,.3);transform:translateX(8px);box-shadow:var(--gl)}
+.cicon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;background:rgba(0,240,255,.08);border:1px solid rgba(0,240,255,.15);flex-shrink:0}
+.clbl{font-size:.75rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px}
+.cval{font-size:.95rem;font-weight:500}
+.cform{display:flex;flex-direction:column;gap:1.2rem}
+.fg{display:flex;flex-direction:column;gap:.4rem}
+.fg label{font-size:.8rem;color:var(--t2);font-weight:500}
+.fg input,.fg textarea{padding:.9rem 1.2rem;background:var(--card);border:1px solid var(--bd);border-radius:8px;color:var(--t1);font-family:'Inter';font-size:.9rem;outline:none;transition:.3s}
+.fg input:focus,.fg textarea:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(0,240,255,.1)}
+.fg textarea{min-height:120px;resize:vertical}
+footer{position:relative;z-index:1;border-top:1px solid var(--bd);padding:4rem 2rem 2rem;background:rgba(2,8,16,.95)}
+.fgrid{max-width:1200px;margin:0 auto 3rem;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem}
+.fbrand h3{font-family:'Orbitron';font-size:1.3rem;margin-bottom:1rem}.fbrand h3 span{color:var(--p)}
+.fbrand p{color:var(--t3);font-size:.85rem;line-height:1.7;margin-bottom:1.5rem}
+.fsoc{display:flex;gap:1rem}
+.fsoc a{width:40px;height:40px;border-radius:10px;background:var(--card);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;color:var(--t2);text-decoration:none;font-size:1.1rem;transition:.3s}
+.fsoc a:hover{border-color:var(--p);color:var(--p);transform:translateY(-3px);box-shadow:var(--gl)}
+.fcol h4{font-family:'Rajdhani';font-size:1rem;font-weight:700;margin-bottom:1.2rem}
+.fcol ul{list-style:none}.fcol ul li{margin-bottom:.7rem}
+.fcol ul li a{color:var(--t3);text-decoration:none;font-size:.85rem;transition:.3s}.fcol ul li a:hover{color:var(--p)}
+.fbot{max-width:1200px;margin:0 auto;padding-top:2rem;border-top:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.fcpy{font-size:.8rem;color:var(--t3)}
+.fleg{display:flex;gap:1.5rem}.fleg a{font-size:.8rem;color:var(--t3);text-decoration:none}.fleg a:hover{color:var(--p)}
+.fi{opacity:0;transform:translateY(30px);transition:all .8s cubic-bezier(.16,1,.3,1)}.fi.vis{opacity:1;transform:translateY(0)}
+@media(max-width:968px){.nlinks{display:none}.mt{display:flex}.ag{grid-template-columns:1fr}.cong{grid-template-columns:1fr}.fgrid{grid-template-columns:1fr 1fr}.pc{grid-template-columns:1fr}}
+@media(max-width:640px){.sec{padding:60px 1rem}.cg{grid-template-columns:1fr}.fgrid{grid-template-columns:1fr}.hbtns{flex-direction:column}.acube{width:180px;height:180px}.cf{width:180px;height:180px}.cf:nth-child(1){transform:rotateY(0) translateZ(90px)}.cf:nth-child(2){transform:rotateY(90deg) translateZ(90px)}.cf:nth-child(3){transform:rotateY(180deg) translateZ(90px)}.cf:nth-child(4){transform:rotateY(270deg) translateZ(90px)}.cf:nth-child(5){transform:rotateX(90deg) translateZ(90px)}.cf:nth-child(6){transform:rotateX(-90deg) translateZ(90px)}}
+</style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+<div class="grid-ov"></div>
+
+<nav id="navbar">
+<a href="#" class="nb"><div class="nl">S</div><div><div class="nt">SAYAN<span>OX</span></div><div class="ns">Enterprises Pvt. Ltd.</div></div></a>
+<ul class="nlinks">
+<li><a href="#home">Home</a></li>
+<li><a href="#about">About</a></li>
+<li><a href="#features">Features</a></li>
+<li><a href="#products">Products</a></li>
+<li><a href="#security">Security</a></li>
+<li><a href="#contact">Contact</a></li>
+<li><a href="#contact" class="ncta">GET ACCESS</a></li>
+</ul>
+<div class="mt" onclick="document.getElementById('mn').classList.toggle('act')"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="mnav" id="mn">
+<button class="mclose" onclick="document.getElementById('mn').classList.remove('act')">&#10005;</button>
+<a href="#home" onclick="document.getElementById('mn').classList.remove('act')">Home</a>
+<a href="#about" onclick="document.getElementById('mn').classList.remove('act')">About</a>
+<a href="#features" onclick="document.getElementById('mn').classList.remove('act')">Features</a>
+<a href="#products" onclick="document.getElementById('mn').classList.remove('act')">Products</a>
+<a href="#security" onclick="document.getElementById('mn').classList.remove('act')">Security</a>
+<a href="#contact" onclick="document.getElementById('mn').classList.remove('act')">Contact</a>
+</div>
+
+<section class="hero" id="home">
+<div class="hc">
+<div class="hbadge"><span class="dot"></span> GATE_SYS: SAYANOX_V4.8 — NODE_SECURE</div>
+<h1 class="htitle">SAYANOX ENTERPRISES</h1>
+<p class="hsub">Next-Generation AI-Native Cybersecurity & Threat Intelligence</p>
+<p class="hdesc">Pioneering the future of digital defense with autonomous AI agents, real-time 3D threat visualization, and cryptographic-grade security infrastructure. Protecting enterprises across the digital frontier.</p>
+<div class="hbtns">
+<a href="#products" class="bp">&#9889; Explore Platform</a>
+<a href="#contact" class="bs">&#128272; Request Access</a>
+</div>
+<div class="hstats">
+<div class="si"><div class="sv" id="c1">0</div><div class="sl">Threats Neutralized</div></div>
+<div class="si"><div class="sv" id="c2">0</div><div class="sl">Enterprise Clients</div></div>
+<div class="si"><div class="sv">99.97%</div><div class="sl">Uptime SLA</div></div>
+<div class="si"><div class="sv">AES-256</div><div class="sl">Encryption</div></div>
+</div>
+</div>
+</section>
+
+<section class="sec" id="about">
+<div class="sh fi"><span class="stag">// WHO WE ARE</span><h2 class="stitle">About Sayanox Private Limited</h2><p class="sdesc">A registered Indian technology company building next-gen AI-powered cybersecurity infrastructure.</p></div>
+<div class="ag">
+<div class="av fi"><div class="acube"><div class="cf">SAYANOX</div><div class="cf">AI CORE</div><div class="cf">SECURE</div><div class="cf">DEFEND</div><div class="cf">DETECT</div><div class="cf">PROTECT</div></div></div>
+<div class="ac fi">
+<h3>Defending the Digital Frontier</h3>
+<p><strong>Sayanox Enterprises Private Limited</strong> is a cutting-edge cybersecurity and AI company headquartered in India. We build autonomous threat detection systems, OSINT intelligence platforms, and enterprise-grade security solutions.</p>
+<p>Our mission is to democratize advanced cybersecurity, making military-grade threat intelligence accessible to all organizations through AI-native architectures and real-time 3D visualization.</p>
+<ul class="al">
+<li>Registered under Companies Act, 2013 — India</li>
+<li>AI-Native Cybersecurity & OSINT Specialization</li>
+<li>Proprietary 3D Threat Graph Analysis Engine</li>
+<li>Autonomous AI Agent Investigation Workflows</li>
+<li>Zero-Trust Security Architecture Design</li>
+<li>Cryptographic Communication Systems (AES-256)</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section class="sec" id="features">
+<div class="sh fi"><span class="stag">// CAPABILITIES</span><h2 class="stitle">Platform Features</h2><p class="sdesc">Enterprise-grade security powered by AI and real-time analytics.</p></div>
+<div class="cg">
+<div class="c3 fi"><div class="ci">&#129302;</div><h3 class="ct">Autonomous AI Agents</h3><p class="cx">LangGraph-powered AI agents that autonomously investigate threats, execute OSINT transforms, and produce structured intelligence reports.</p><span class="ctag">LANGGRAPH + LLM</span></div>
+<div class="c3 fi"><div class="ci">&#127760;</div><h3 class="ct">3D Threat Visualization</h3><p class="cx">WebGL-powered 3D force-directed graph rendering 100,000+ nodes at 60 FPS. Visualize attack chains and hidden correlations in real-time.</p><span class="ctag">WEBGL + THREE.JS</span></div>
+<div class="c3 fi"><div class="ci">&#128269;</div><h3 class="ct">OSINT Intelligence Engine</h3><p class="cx">Comprehensive OSINT gathering with DNS resolution, WHOIS lookups, VirusTotal integration, and custom transform pipelines.</p><span class="ctag">ASYNC TRANSFORMS</span></div>
+<div class="c3 fi"><div class="ci">&#129504;</div><h3 class="ct">Semantic Correlation</h3><p class="cx">Vector embedding-powered identity matching across entity types. Discover hidden links using AI-driven similarity search.</p><span class="ctag">QDRANT + EMBEDDINGS</span></div>
+<div class="c3 fi"><div class="ci">&#9889;</div><h3 class="ct">Real-Time Streaming</h3><p class="cx">WebSocket-based live graph updates. Sub-second latency for threat alerts and investigation progress tracking.</p><span class="ctag">WEBSOCKET + REDIS</span></div>
+<div class="c3 fi"><div class="ci">&#128737;</div><h3 class="ct">Cryptographic Security</h3><p class="cx">AES-256 encrypted channels, zero-trust architecture, hardware-backed key management. Military-grade encryption.</p><span class="ctag">AES-256 + ZERO-TRUST</span></div>
+<div class="c3 fi"><div class="ci">&#128202;</div><h3 class="ct">In-Memory Graph DB</h3><p class="cx">Memgraph-powered ultra-fast Cypher queries. Process millions of edges with sub-millisecond response times.</p><span class="ctag">MEMGRAPH + CYPHER</span></div>
+<div class="c3 fi"><div class="ci">&#128279;</div><h3 class="ct">Distributed Task Engine</h3><p class="cx">Celery + Redis async task queue. Scale horizontally with unlimited workers for high-throughput investigations.</p><span class="ctag">CELERY + REDIS</span></div>
+<div class="c3 fi"><div class="ci">&#128051;</div><h3 class="ct">Cloud-Native Deploy</h3><p class="cx">Docker orchestration, Kubernetes-ready, auto-scaling, health checks, zero-downtime rolling updates.</p><span class="ctag">DOCKER + K8S</span></div>
+</div>
+</section>
+
+<section class="sec" id="products">
+<div class="sh fi"><span class="stag">// PRODUCT SUITE</span><h2 class="stitle">Our Products</h2><p class="sdesc">AI-native security products for the modern threat landscape.</p></div>
+<div class="pc fi"><div class="pi">&#128376;</div><div class="pinfo"><h3>NEXUS-OSINT Platform</h3><p>Flagship AI-Native OSINT & 3D Link Analysis Platform. Open-source Maltego alternative with autonomous AI agents, real-time 3D graph, semantic correlation, and 50+ OSINT transforms.</p><div class="ptags"><span>Python 3.11+</span><span>FastAPI</span><span>Memgraph</span><span>LangGraph</span><span>Next.js</span><span>WebGL</span><span>Qdrant</span><span>Celery</span></div></div></div>
+<div class="pc fi"><div class="pi">&#128737;</div><div class="pinfo"><h3>Sayanox Security Shield</h3><p>Enterprise endpoint protection with AI-powered threat detection, automated incident response, and real-time threat intelligence feeds.</p><div class="ptags"><span>Zero-Day</span><span>AI Detection</span><span>EDR</span><span>SIEM</span><span>Threat Intel</span></div></div></div>
+<div class="pc fi"><div class="pi">&#128272;</div><div class="pinfo"><h3>Sayanox Cryptographic Suite</h3><p>E2E encrypted communication with AES-256 channels, hardware-backed key management, and zero-knowledge architecture.</p><div class="ptags"><span>AES-256</span><span>Zero-Knowledge</span><span>E2E</span><span>HSM</span><span>PKI</span></div></div></div>
+<div class="pc fi"><div class="pi">&#128640;</div><div class="pinfo"><h3>Sayanox Dev Sandbox</h3><p>Isolated dev/testing environment with AES-256 secured channels for malware analysis and exploit testing.</p><div class="ptags"><span>Sandboxed</span><span>Isolated</span><span>Malware Analysis</span><span>Secure</span></div></div></div>
+</section>
+<section class="sec" id="security">
+<div class="sh fi"><span class="stag">// SYSTEM STATUS</span><h2 class="stitle">Security Infrastructure</h2><p class="sdesc">Cryptographic systems at the highest security standards.</p></div>
+<div class="term fi">
+<div class="th"><div class="td r"></div><div class="td y"></div><div class="td g"></div><span class="tt">sayanox@core:~/security-audit</span></div>
+<div class="tb">
+<div><span class="pr">sayanox@core:~$</span> ./verify_system_integrity</div>
+<div class="ou">[&#10003;] AES-256 Encryption Module ............ ACTIVE</div>
+<div class="ou">[&#10003;] Zero-Trust Network Policy ............ ENFORCED</div>
+<div class="ou">[&#10003;] AI Threat Detection Engine ........... ONLINE</div>
+<div class="ou">[&#10003;] Memgraph Cluster (3 nodes) ........... HEALTHY</div>
+<div class="ou">[&#10003;] Qdrant Vector Store .................. SYNCED</div>
+<div class="ou">[&#10003;] Redis Task Queue (8 workers) ......... RUNNING</div>
+<div class="ou">[&#10003;] WebSocket Real-Time Stream ........... CONNECTED</div>
+<div class="ou">[&#10003;] LangGraph Agent Core ................. STANDBY</div>
+<div class="cm"># All systems operational. Threat level: MINIMAL</div>
+<div><span class="pr">sayanox@core:~$</span> &#9608;</div>
+</div>
+</div>
+<div class="sban fi"><span style="font-size:2rem">&#128737;</span><p><strong>SAYANOX SECURITY SHIELD</strong> — Sayanox&#174; is a registered trademark of Sayanox Private Limited. All content, source codes, and intellectual property are protected under international copyright & patent laws. Unauthorized reproduction or reverse engineering is strictly prohibited.</p></div>
+</section>
+
+<section class="sec" id="contact">
+<div class="sh fi"><span class="stag">// GET IN TOUCH</span><h2 class="stitle">Contact Us</h2><p class="sdesc">Reach out for partnerships, inquiries, or access requests.</p></div>
+<div class="cong">
+<div class="coni fi">
+<a href="mailto:sm6881164@gmail.com" class="citem"><div class="cicon">&#128231;</div><div><div class="clbl">Email</div><div class="cval">sm6881164@gmail.com</div></div></a>
+<a href="https://github.com/sayan9168" target="_blank" class="citem"><div class="cicon">&#128187;</div><div><div class="clbl">GitHub</div><div class="cval">github.com/sayan9168</div></div></a>
+<a href="https://twitter.com/notfound_sayan" target="_blank" class="citem"><div class="cicon">&#128038;</div><div><div class="clbl">Twitter / X</div><div class="cval">@notfound_sayan</div></div></a>
+<a href="https://instagram.com/_sayyyyan" target="_blank" class="citem"><div class="cicon">&#128248;</div><div><div class="clbl">Instagram</div><div class="cval">@_sayyyyan</div></div></a>
+<div class="citem"><div class="cicon">&#127970;</div><div><div class="clbl">Company</div><div class="cval">Sayanox Enterprises Private Limited</div></div></div>
+<div class="citem"><div class="cicon">&#128205;</div><div><div class="clbl">Registered In</div><div class="cval">India (Companies Act, 2013)</div></div></div>
+</div>
+<div class="cform fi">
+<div class="fg"><label>Full Name</label><input type="text" placeholder="Enter your full name"></div>
+<div class="fg"><label>Email Address</label><input type="email" placeholder="Enter your email"></div>
+<div class="fg"><label>Organization</label><input type="text" placeholder="Company name"></div>
+<div class="fg"><label>Message</label><textarea placeholder="Your inquiry or access request..."></textarea></div>
+<button class="bp" style="width:100%;justify-content:center" onclick="this.textContent='&#10003; Sent!';this.style.background='linear-gradient(135deg,#00ff88,#00a8b3)';setTimeout(()=>{this.textContent='&#128640; Send Message';this.style.background=''},3000)">&#128640; Send Message</button>
+</div>
+</div>
+</section>
+
+<footer>
+<div class="fgrid">
+<div class="fbrand">
+<h3>SAYAN<span>OX</span> Enterprises Pvt. Ltd.</h3>
+<p>Pioneering AI-native cybersecurity solutions. Protecting enterprises with autonomous threat detection, 3D intelligence visualization, and cryptographic-grade security.</p>
+<div class="fsoc">
+<a href="https://github.com/sayan9168" target="_blank">&#128187;</a>
+<a href="https://twitter.com/notfound_sayan" target="_blank">&#128038;</a>
+<a href="https://instagram.com/_sayyyyan" target="_blank">&#128248;</a>
+<a href="mailto:sm6881164@gmail.com">&#128231;</a>
+</div>
+</div>
+<div class="fcol"><h4>Platform</h4><ul><li><a href="#features">Features</a></li><li><a href="#products">Products</a></li><li><a href="#security">Security</a></li><li><a href="#">Docs</a></li><li><a href="#">API</a></li></ul></div>
+<div class="fcol"><h4>Company</h4><ul><li><a href="#about">About</a></li><li><a href="#">Careers</a></li><li><a href="#">Blog</a></li><li><a href="#contact">Contact</a></li><li><a href="#">Partners</a></li></ul></div>
+<div class="fcol"><h4>Legal</h4><ul><li><a href="#">Privacy Policy</a></li><li><a href="#">Terms of Service</a></li><li><a href="#">Sayanox License v1.1</a></li><li><a href="#">Cookies</a></li><li><a href="#">Compliance</a></li></ul></div>
+</div>
+<div class="fbot">
+<div class="fcpy">&#169; 2026 Sayanox Enterprises Private Limited. All rights reserved. | Sayanox&#174; is a registered trademark.</div>
+<div class="fleg"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Sayanox License v1.1</a></div>
+</div>
+</footer>
+
+<script>
+(function(){
+var c=document.getElementById('bg-canvas'),r=new THREE.WebGLRenderer({canvas:c,alpha:true,antialias:true});
+r.setSize(innerWidth,innerHeight);r.setPixelRatio(Math.min(devicePixelRatio,2));
+var sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,1000);cam.position.z=50;
+var N=2000,pos=new Float32Array(N*3),col=new Float32Array(N*3);
+for(var i=0;i<N;i++){pos[i*3]=(Math.random()-.5)*150;pos[i*3+1]=(Math.random()-.5)*150;pos[i*3+2]=(Math.random()-.5)*150;var t=Math.random();col[i*3]=t*.48;col[i*3+1]=.5+t*.4;col[i*3+2]=1;}
+var geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(pos,3));geo.setAttribute('color',new THREE.BufferAttribute(col,3));
+var mat=new THREE.PointsMaterial({size:.5,vertexColors:true,transparent:true,opacity:.6,blending:THREE.AdditiveBlending});
+var pts=new THREE.Points(geo,mat);sc.add(pts);
+var ig=new THREE.IcosahedronGeometry(20,1),im=new THREE.MeshBasicMaterial({color:0x00f0ff,wireframe:true,transparent:true,opacity:.08});
+var ico=new THREE.Mesh(ig,im);sc.add(ico);
+var tg=new THREE.TorusGeometry(30,.5,16,100),tm=new THREE.MeshBasicMaterial({color:0x7b2fff,wireframe:true,transparent:true,opacity:.06});
+var tor=new THREE.Mesh(tg,tm);tor.rotation.x=Math.PI/3;sc.add(tor);
+var mx=0,my=0;document.addEventListener('mousemove',function(e){mx=(e.clientX/innerWidth-.5)*2;my=(e.clientY/innerHeight-.5)*2;});
+function anim(){requestAnimationFrame(anim);pts.rotation.y+=.0003;pts.rotation.x+=.0001;ico.rotation.x+=.002;ico.rotation.y+=.003;tor.rotation.z+=.001;tor.rotation.y+=.002;cam.position.x+=(mx*5-cam.position.x)*.02;cam.position.y+=(-my*5-cam.position.y)*.02;cam.lookAt(sc.position);r.render(sc,cam);}
+anim();
+addEventListener('resize',function(){cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();r.setSize(innerWidth,innerHeight);});
+})();
+addEventListener('scroll',function(){var n=document.getElementById('navbar');n.classList.toggle('sc',scrollY>50);});
+var obs=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)e.target.classList.add('vis');});},{threshold:.1});
+document.querySelectorAll('.fi').forEach(function(el){obs.observe(el);});
+function ac(id,target,suf){var el=document.getElementById(id),cur=0,inc=target/60,t=setInterval(function(){cur+=inc;if(cur>=target){cur=target;clearInterval(t);}el.textContent=Math.floor(cur).toLocaleString()+(suf||'');},30);}
+var ho=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){ac('c1',2847563,'+');ac('c2',150,'+');ho.disconnect();}});});
+ho.observe(document.querySelector('.hstats'));
+document.querySelectorAll('.c3').forEach(function(card){
+card.addEventListener('mousemove',function(e){var r=card.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,cx=r.width/2,cy=r.height/2;card.style.transform='perspective(1000px) rotateX('+((y-cy)/15)+'deg) rotateY('+((cx-x)/15)+'deg) translateY(-10px)';});
+card.addEventListener('mouseleave',function(){card.style.transform='';});
+});
+document.querySelectorAll('a[href^="#"]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();var t=document.querySelector(this.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth'});});});
+console.log('%c SAYANOX ENTERPRISES PRIVATE LIMITED ','background:#020810;color:#00f0ff;font-size:16px;font-weight:bold;padding:10px;');
+console.log('%c Authorized Access Only. ','color:#ff006e;font-size:11px;');
+</script>
+</body>
+</html>
