@@ -1,79 +1,30 @@
 "use client";
-
-import dynamic from "next/dynamic";
-import { Sidebar } from "@/components/Sidebar";
-import { AgentPanel } from "@/components/AgentPanel";
-import { useGraphStore } from "@/store/graphStore";
-
-// Dynamically import 3D graph (SSR incompatible)
-const Graph3D = dynamic(() => import("@/components/Graph3D"), {
-  ssr: false,
-  loading: () => (
-    <div className="flex items-center justify-center h-screen bg-nexus-900">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-cyan-400 mx-auto mb-4" />
-        <p className="text-cyan-400 text-lg">Initializing 3D Graph Engine...</p>
-      </div>
-    </div>
-  ),
-});
-
-export default function Home() {
-  const { sidebarOpen, agentPanelOpen } = useGraphStore();
-
-  return (
-    <main className="relative h-screen w-screen overflow-hidden bg-nexus-900">
-      {/* 3D Graph (full screen background) */}
-      <div className="absolute inset-0 z-0">
-        <Graph3D />
-      </div>
-
-      {/* Sidebar (left) */}
-      {sidebarOpen && (
-        <div className="absolute left-0 top-0 h-full z-20">
-          <Sidebar />
-        </div>
-      )}
-
-      {/* Agent Panel (right) */}
-      {agentPanelOpen && (
-        <div className="absolute right-0 top-0 h-full z-20">
-          <AgentPanel />
-        </div>
-      )}
-
-      {/* Top Bar */}
-      <header className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-6 py-3 bg-gradient-to-b from-nexus-900/95 to-transparent">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center">
-            <span className="text-cyan-400 font-bold text-sm">N</span>
-          </div>
-          <h1 className="text-lg font-semibold text-white">
-            NEXUS<span className="text-cyan-400">-OSINT</span>
-          </h1>
-          <span className="text-xs text-gray-500 ml-2">v1.0.0</span>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <ConnectionStatus />
-        </div>
-      </header>
-    </main>
-  );
+import {useEffect,useState} from "react";
+const API=process.env.NEXT_PUBLIC_API_URL||"http://localhost:8000/api/v1";
+type Case={id:string,name:string,description:string,status:string,targets:string[],evidence:any[],notes:any[]};
+async function api(path:string,token:string,options:RequestInit={}){const r=await fetch(API+path,{...options,headers:{"Content-Type":"application/json",Authorization:`Bearer ${token}`,...(options.headers||{})}});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.detail||`HTTP ${r.status}`);return d}
+export default function Home(){
+ const [token,setToken]=useState("");const [user,setUser]=useState<any>(null);const [login,setLogin]=useState(true);const [username,setUsername]=useState("");const [password,setPassword]=useState("");const [cases,setCases]=useState<Case[]>([]);const [selected,setSelected]=useState<Case|null>(null);const [name,setName]=useState("New Investigation");const [target,setTarget]=useState("");const [tab,setTab]=useState("overview");const [jobs,setJobs]=useState<any[]>([]);const [intel,setIntel]=useState<any>(null);const [audit,setAudit]=useState<any[]>([]);const [busy,setBusy]=useState(false);const [error,setError]=useState("");
+ useEffect(()=>{const t=localStorage.getItem("nexus_token");if(t){setToken(t);api("/auth/me",t).then(x=>{setUser(x.user);loadCases(t)}).catch(()=>localStorage.removeItem("nexus_token"))}},[]);
+ async function loadCases(t=token){try{const c=await api("/cases/",t);setCases(c);if(c[0]&&!selected)setSelected(c[0])}catch(e:any){setError(e.message)}}
+ async function auth(){setBusy(true);setError("");try{const d=await api(`/auth/${login?"login":"register"}`,"",{method:"POST",body:JSON.stringify({username,password})});setToken(d.token);setUser(d.user);localStorage.setItem("nexus_token",d.token);await loadCases(d.token)}catch(e:any){setError(e.message)}finally{setBusy(false)}}
+ async function createCase(){try{const c=await api("/cases/",token,{method:"POST",body:JSON.stringify({name,description:"Authorized OSINT investigation"})});setCases(x=>[c,...x]);setSelected(c)}catch(e:any){setError(e.message)}}
+ async function addTarget(){if(!selected||!target)return;setBusy(true);try{const c=await api(`/cases/${selected.id}/targets`,token,{method:"POST",body:JSON.stringify({target})});setSelected(c);setCases(x=>x.map(v=>v.id===c.id?c:v));setTarget("")}catch(e:any){setError(e.message)}finally{setBusy(false)}}
+ async function scan(){if(!selected||!target)return;setBusy(true);try{await api("/platform/jobs",token,{method:"POST",body:JSON.stringify({case_id:selected.id,target,target_type:target.includes("@")==true?"email":target.startsWith("http")?"url":/^[0-9.]+$/.test(target)?"ip":"domain",authorized:true})});await addTarget();setTab("jobs");pollJobs()}catch(e:any){setError(e.message)}finally{setBusy(false)}}
+ async function pollJobs(){try{const d=await api("/platform/jobs",token);setJobs(d.jobs);setTimeout(async()=>{const x=await api("/platform/jobs",token);setJobs(x.jobs)},1500)}catch(e:any){setError(e.message)}}
+ async function loadTab(t:string){setTab(t);if(!selected)return;try{if(t==="audit")setAudit((await api("/platform/audit",token)).events);if(t==="intel"&&target)setIntel(await api("/intelligence/dns-rdap",token,{method:"POST",body:JSON.stringify({domain:target})}));if(t==="jobs")await pollJobs()}catch(e:any){setError(e.message)}}
+ if(!user)return <div className="auth"><div className="authbox"><div className="brand">NEXUS<span>OSINT</span></div><p>Public-source investigation workspace</p><input placeholder="Username" value={username} onChange={e=>setUsername(e.target.value)}/><input placeholder="Password (10+ chars)" type="password" value={password} onChange={e=>setPassword(e.target.value)}/><button onClick={auth} disabled={busy}>{busy?"Working…":login?"Sign in":"Create account"}</button><button className="ghost" onClick={()=>setLogin(!login)}>{login?"Need an account? Register":"Already have an account? Sign in"}</button>{error&&<div className="error">{error}</div>}</div></div>;
+ const nav=["overview","evidence","jobs","graph","timeline","score","reports","audit","intel"];
+ return <main><header><div className="brand">NEXUS<span>OSINT</span></div><div className="identity">{user.username} · <b>{user.role}</b><button className="ghost" onClick={()=>{localStorage.removeItem("nexus_token");location.reload()}}>Sign out</button></div></header><div className="shell"><aside><button className="new" onClick={createCase}>＋ New Case</button>{cases.map(c=><button key={c.id} className={selected?.id===c.id?"case active":"case"} onClick={()=>setSelected(c)}><b>{c.name}</b><small>{c.status} · {c.targets?.length||0} targets</small></button>)}</aside><section className="workspace"><div className="title"><div><h1>{selected?.name||"Investigation Workspace"}</h1><p>{selected?.description||"Create a case to begin."}</p></div><div className="targetbar"><input placeholder="domain / IP / URL / email" value={target} onChange={e=>setTarget(e.target.value)}/><button onClick={addTarget}>Add</button><button onClick={scan} disabled={busy}>Scan</button></div></div><nav>{nav.map(n=><button key={n} className={tab===n?"selected":""} onClick={()=>loadTab(n)}>{n}</button>)}</nav>{error&&<div className="error">{error}</div>}<div className="grid">
+ {tab==="overview"&&<><Card title="Targets"><div className="metric">{selected?.targets?.length||0}</div></Card><Card title="Evidence"><div className="metric">{selected?.evidence?.length||0}</div></Card><Card title="Jobs"><div className="metric">{jobs.length}</div></Card><Card title="Status"><div className="metric">{selected?.status||"—"}</div></Card><Panel title="Investigation controls"><p>Use <b>Add</b> to store a target, then <b>Scan</b> to run bounded public-source collection. Every active collection requires an explicit authorization assertion.</p></Panel></>}
+ {tab==="evidence"&&<Panel title="Evidence table"><Table rows={selected?.evidence||[]} cols={["source","target","observed_at","confidence","provenance_hash"]}/></Panel>}
+ {tab==="jobs"&&<Panel title="Background jobs"><Table rows={jobs} cols={["id","target","target_type","status","attempts","created_at"]}/></Panel>}
+ {tab==="graph"&&<Panel title="Relationship graph"><div className="graph"><div className="node root">CASE</div>{(selected?.targets||[]).map((t,i)=><div className="node" key={t} style={{left:`${15+(i*17)%75}%`,top:`${20+(i*29)%65}%`}}>{t}</div>)}</div></Panel>}
+ {tab==="timeline"&&<Panel title="Evidence timeline"><Table rows={[...(selected?.evidence||[])].sort((a,b)=>String(a.observed_at).localeCompare(String(b.observed_at)))} cols={["observed_at","source","target","confidence"]}/></Panel>}
+ {tab==="score"&&<Panel title="Deterministic confidence score"><div className="score">{selected?.evidence?.length?Math.round(selected.evidence.reduce((a:any,e:any)=>a+Number(e.confidence||0),0)/selected.evidence.length*100):0}<small>/100</small></div><p>Explainable evidence confidence; no opaque model score.</p></Panel>}
+ {tab==="reports"&&<Panel title="Reports"><p>Deterministic Markdown, HTML and JSON reports are available through the API.</p><div className="actions"><button onClick={()=>window.open(`${API}/reports/${selected?.id}/markdown`)}>Markdown</button><button onClick={()=>window.open(`${API}/reports/${selected?.id}/html`)}>HTML</button><button onClick={()=>window.open(`${API}/platform/cases/${selected?.id}/export.json`)}>JSON</button></div></Panel>}
+ {tab==="audit"&&<Panel title="Tamper-evident audit viewer"><Table rows={audit} cols={["created_at","actor","action","resource","event_hash"]}/></Panel>}
+ {tab==="intel"&&<Panel title="DNS / RDAP intelligence"><p>Enter a domain above and open this tab.</p>{intel&&<pre>{JSON.stringify(intel,null,2)}</pre>}</Panel>}
+ </div></section></div></main>
 }
-
-function ConnectionStatus() {
-  const { wsConnected } = useGraphStore();
-  return (
-    <div className="flex items-center gap-2">
-      <div
-        className={`w-2 h-2 rounded-full ${
-          wsConnected ? "bg-green-400 animate-pulse" : "bg-red-400"
-        }`}
-      />
-      <span className="text-xs text-gray-400">
-        {wsConnected ? "Live" : "Disconnected"}
-      </span>
-    </div>
-  );
-}
+function Card({title,children}:{title:string,children:any}){return <div className="card"><small>{title}</small>{children}</div>};function Panel({title,children}:{title:string,children:any}){return <div className="panel"><h2>{title}</h2>{children}</div>};function Table({rows,cols}:{rows:any[],cols:string[]}){return <div className="tablewrap"><table><thead><tr>{cols.map(c=><th key={c}>{c}</th>)}</tr></thead><tbody>{rows.map((r,i)=><tr key={r.id||i}>{cols.map(c=><td key={c}>{typeof r[c]==="object"?JSON.stringify(r[c]):String(r[c]??"—")}</td>)}</tr>)}</tbody></table>{!rows.length&&<p className="muted">No records yet.</p>}</div>}
