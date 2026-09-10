@@ -1,12 +1,23 @@
-"""Read-only report rendering endpoints for investigation objects."""
+"""Read-only deterministic report rendering endpoints."""
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import HTMLResponse, PlainTextResponse
 
 from osint_core.cases import store
-from osint_core.models import Investigation, EntityType
+from osint_core.models import EntityType, Investigation
 from osint_core.reporting import to_html, to_markdown
 
 router = APIRouter()
+
+
+def _target_type(target: str) -> EntityType:
+    if target.startswith(("http://", "https://")):
+        return EntityType.URL
+    if "@" in target and " " not in target:
+        return EntityType.EMAIL
+    parts = target.split(".")
+    if len(parts) >= 2:
+        return EntityType.DOMAIN
+    return EntityType.USERNAME
 
 
 def _investigation(case_id: str) -> Investigation:
@@ -17,9 +28,9 @@ def _investigation(case_id: str) -> Investigation:
     return Investigation(
         id=case.id,
         target=target,
-        target_type=EntityType.DOMAIN,
+        target_type=_target_type(target),
         authorized=True,
-        evidence=[],
+        evidence=case.evidence,
     )
 
 
