@@ -1,8 +1,4 @@
-"""Small SQLite persistence layer for local-first investigations.
-
-The database is intentionally local and dependency-free. Deployments can point
-NEXUS_DB_PATH at a durable volume.
-"""
+"""Small SQLite persistence layer for local-first investigations."""
 from __future__ import annotations
 
 import json
@@ -24,6 +20,7 @@ class Database:
     def _connect(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.path)
         conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA foreign_keys=ON")
         return conn
 
     def _init(self) -> None:
@@ -77,24 +74,16 @@ class Database:
                 """
             )
 
-    def _connect(self) -> sqlite3.Connection:
-        conn = sqlite3.connect(self.path)
-        conn.row_factory = sqlite3.Row
-        conn.execute("PRAGMA foreign_keys=ON")
-        return conn
-
     def execute(self, sql: str, params: tuple[Any, ...] = ()) -> list[sqlite3.Row]:
         with self._connect() as db:
             cur = db.execute(sql, params)
-            rows = cur.fetchall()
-        return rows
+            return cur.fetchall()
 
     def insert(self, sql: str, params: tuple[Any, ...] = ()) -> None:
         with self._connect() as db:
             db.execute(sql, params)
 
 
-# Shared application database. Override NEXUS_DB_PATH for production volumes.
 db = Database()
 
 
