@@ -1,0 +1,1 @@
+{"schema_version":"2.0","case":{"name":"Example Domain Triage","status":"open","authorized":true},"targets":[{"type":"domain","value":"example.com"}],"notes":["Synthetic demo dataset; no private or credential data."],"evidence":[],"relationships":[]}
