@@ -1,7 +1,8 @@
 from datetime import datetime, timezone
 
+from osint_core.cases import Case
 from osint_core.graph import project
-from osint_core.models import Case, Evidence
+from osint_core.models import Evidence
 
 
 def test_graph_projection_contains_provenance():
