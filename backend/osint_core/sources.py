@@ -6,6 +6,7 @@ SOURCES = [
     {"id": "rdap.org", "name": "RDAP", "category": "registration", "active": True, "privacy": "public"},
     {"id": "reverse-dns", "name": "Reverse DNS", "category": "network", "active": True, "privacy": "public"},
     {"id": "http-head", "name": "HTTP HEAD", "category": "web", "active": True, "privacy": "public"},
+    {"id": "tls", "name": "TLS Certificate", "category": "web", "active": True, "privacy": "public"},
     {"id": "validator", "name": "Local Validator", "category": "validation", "active": True, "privacy": "local"},
 ]
 
