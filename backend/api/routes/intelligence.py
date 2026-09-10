@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from api.security import require_permission
 from osint_core.intelligence import domain_intelligence, upsert_entity
+from osint_core.persistence import db
 router=APIRouter()
 class DomainRequest(BaseModel): domain:str=Field(min_length=1,max_length=253,pattern=r"^[A-Za-z0-9][A-Za-z0-9.-]*[A-Za-z0-9]$")
 class EntityRequest(BaseModel):
