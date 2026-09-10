@@ -14,7 +14,7 @@ class Database:
  def _init(self):
   with self._connect() as db:
    db.executescript("""
-   CREATE TABLE IF NOT EXISTS cases(id TEXT PRIMARY KEY,name TEXT NOT NULL,description TEXT NOT NULL,status TEXT NOT NULL,created_at TEXT NOT NULL,tags_json TEXT NOT NULL DEFAULT '[]',workflow TEXT NOT NULL DEFAULT 'triage');
+   CREATE TABLE IF NOT EXISTS cases(id TEXT PRIMARY KEY,name TEXT NOT NULL,description TEXT NOT NULL,status TEXT NOT NULL,created_at TEXT NOT NULL,tags_json TEXT NOT NULL DEFAULT '[]',workflow TEXT NOT NULL DEFAULT 'triage',authorized INTEGER NOT NULL DEFAULT 0);
    CREATE TABLE IF NOT EXISTS targets(case_id TEXT NOT NULL,target TEXT NOT NULL,PRIMARY KEY(case_id,target),FOREIGN KEY(case_id) REFERENCES cases(id) ON DELETE CASCADE);
    CREATE TABLE IF NOT EXISTS notes(id TEXT PRIMARY KEY,case_id TEXT NOT NULL,body TEXT NOT NULL,created_at TEXT NOT NULL,FOREIGN KEY(case_id) REFERENCES cases(id) ON DELETE CASCADE);
    CREATE TABLE IF NOT EXISTS evidence(id TEXT PRIMARY KEY,case_id TEXT NOT NULL,source TEXT NOT NULL,target TEXT NOT NULL,observed_at TEXT NOT NULL,data_json TEXT NOT NULL,confidence REAL NOT NULL,notes TEXT,provenance_hash TEXT NOT NULL,FOREIGN KEY(case_id) REFERENCES cases(id) ON DELETE CASCADE);
@@ -32,6 +32,7 @@ class Database:
    cols={r[1] for r in db.execute("PRAGMA table_info(cases)").fetchall()}
    if "tags_json" not in cols: db.execute("ALTER TABLE cases ADD COLUMN tags_json TEXT NOT NULL DEFAULT '[]'")
    if "workflow" not in cols: db.execute("ALTER TABLE cases ADD COLUMN workflow TEXT NOT NULL DEFAULT 'triage'")
+   if "authorized" not in cols: db.execute("ALTER TABLE cases ADD COLUMN authorized INTEGER NOT NULL DEFAULT 0")
  def execute(self,sql:str,params:tuple[Any,...]=()):
   with self._connect() as db:return db.execute(sql,params).fetchall()
  def insert(self,sql:str,params:tuple[Any,...]=()):
