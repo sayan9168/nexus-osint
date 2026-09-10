@@ -63,8 +63,25 @@ class Database:
                     FOREIGN KEY (case_id) REFERENCES cases(id) ON DELETE CASCADE
                 );
                 CREATE INDEX IF NOT EXISTS idx_evidence_case ON evidence(case_id);
+                CREATE TABLE IF NOT EXISTS audit_events (
+                    id TEXT PRIMARY KEY,
+                    created_at TEXT NOT NULL,
+                    actor TEXT NOT NULL,
+                    action TEXT NOT NULL,
+                    resource TEXT NOT NULL,
+                    metadata TEXT NOT NULL,
+                    previous_hash TEXT NOT NULL,
+                    event_hash TEXT NOT NULL
+                );
+                CREATE INDEX IF NOT EXISTS idx_audit_created ON audit_events(created_at);
                 """
             )
+
+    def _connect(self) -> sqlite3.Connection:
+        conn = sqlite3.connect(self.path)
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA foreign_keys=ON")
+        return conn
 
     def execute(self, sql: str, params: tuple[Any, ...] = ()) -> list[sqlite3.Row]:
         with self._connect() as db:
