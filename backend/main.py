@@ -23,7 +23,7 @@ _RATE={}
 def permission_for(path,method):
  if path.endswith("/audit"):return "audit:read"
  if "/jobs" in path:return "job:run"
- if path.startswith("/api/v1/cases") or path.startswith("/api/v1/intelligence/entities"):return "case:write" if method in {"POST","PUT","PATCH","DELETE"} else "case:read"
+ if path.startswith("/api/v1/cases") or path.startswith("/api/v1/intelligence/entities") or path.startswith("/api/v1/cases") or path.startswith("/api/v1/platform/cases"):return "case:write" if method in {"POST","PUT","PATCH","DELETE"} else "case:read"
  if path.startswith("/api/v1/osint") or path.endswith("/dns-rdap"):return "scan:run" if method in {"POST","PUT","PATCH"} else "case:read"
  if path.startswith("/api/v1/reports"):return "report:read"
  if path.startswith("/api/v1/investigation-graph") or path.startswith("/api/v1/graph"):return "graph:read"
