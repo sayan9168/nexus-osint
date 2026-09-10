@@ -9,10 +9,10 @@ from .persistence import db,json_dumps
 class CaseNote(BaseModel):
  id:str=Field(default_factory=lambda:str(uuid4()));body:str;created_at:datetime=Field(default_factory=lambda:datetime.now(timezone.utc))
 class Case(BaseModel):
- id:str=Field(default_factory=lambda:str(uuid4()));name:str;description:str="";status:str="open";workflow:str="triage";tags:list[str]=Field(default_factory=list);targets:list[str]=Field(default_factory=list);notes:list[CaseNote]=Field(default_factory=list);evidence:list[Evidence]=Field(default_factory=list);created_at:datetime=Field(default_factory=lambda:datetime.now(timezone.utc))
+ id:str=Field(default_factory=lambda:str(uuid4()));name:str;description:str="";status:str="open";workflow:str="triage";authorized:bool=False;tags:list[str]=Field(default_factory=list);targets:list[str]=Field(default_factory=list);notes:list[CaseNote]=Field(default_factory=list);evidence:list[Evidence]=Field(default_factory=list);created_at:datetime=Field(default_factory=lambda:datetime.now(timezone.utc))
 class CaseStore:
- def create(self,name:str,description:str="")->Case:
-  case=Case(name=name,description=description);db.insert("INSERT INTO cases(id,name,description,status,created_at,tags_json,workflow) VALUES(?,?,?,?,?,?,?)",(case.id,case.name,case.description,case.status,case.created_at.isoformat(),"[]",case.workflow));return case
+ def create(self,name:str,description:str="",authorized:bool=False)->Case:
+  case=Case(name=name,description=description,authorized=authorized);db.insert("INSERT INTO cases(id,name,description,status,created_at,tags_json,workflow,authorized) VALUES(?,?,?,?,?,?,?,?)",(case.id,case.name,case.description,case.status,case.created_at.isoformat(),"[]",case.workflow,int(case.authorized)));return case
  def _hydrate(self,row)->Case:
   targets=[r[0] for r in db.execute("SELECT target FROM targets WHERE case_id=? ORDER BY target",(row["id"],))]
   notes=[CaseNote(id=r["id"],body=r["body"],created_at=datetime.fromisoformat(r["created_at"])) for r in db.execute("SELECT id,body,created_at FROM notes WHERE case_id=? ORDER BY created_at",(row["id"],))]
@@ -21,7 +21,8 @@ class CaseStore:
    evidence.append(Evidence(id=r["id"],source=r["source"],target=r["target"],observed_at=datetime.fromisoformat(r["observed_at"]),data=json.loads(r["data_json"]),confidence=r["confidence"],notes=r["notes"],provenance_hash=r["provenance_hash"]))
   tags=json.loads(row["tags_json"] or "[]") if "tags_json" in row.keys() else []
   workflow=row["workflow"] if "workflow" in row.keys() else ("closed" if row["status"]=="closed" else "triage")
-  return Case(id=row["id"],name=row["name"],description=row["description"],status=row["status"],workflow=workflow,tags=tags,targets=targets,notes=notes,evidence=evidence,created_at=datetime.fromisoformat(row["created_at"]))
+  authorized=bool(row["authorized"]) if "authorized" in row.keys() else False
+  return Case(id=row["id"],name=row["name"],description=row["description"],status=row["status"],workflow=workflow,authorized=authorized,tags=tags,targets=targets,notes=notes,evidence=evidence,created_at=datetime.fromisoformat(row["created_at"]))
  def list(self)->list[Case]:return [self._hydrate(r) for r in db.execute("SELECT * FROM cases ORDER BY created_at DESC")]
  def get(self,case_id:str)->Case|None:
   rows=db.execute("SELECT * FROM cases WHERE id=?",(case_id,));return self._hydrate(rows[0]) if rows else None
