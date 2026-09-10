@@ -10,7 +10,6 @@ from urllib.parse import urlparse
 
 from .models import EntityType, Evidence
 
-
 USER_AGENT = "NEXUS-OSINT/1.0 (+authorized-security-research)"
 
 
@@ -28,28 +27,56 @@ def normalize_target(target: str, target_type: EntityType) -> str:
         value = value.lower().rstrip(".")
     elif target_type == EntityType.EMAIL:
         value = value.lower()
-    elif target_type == EntityType.URL:
-        if not value.startswith(("http://", "https://")):
-            value = "https://" + value
+    elif target_type == EntityType.URL and not value.startswith(("http://", "https://")):
+        value = "https://" + value
     return value
+
+
+def _resolve_public(hostname: str, port: int) -> set[str]:
+    infos = socket.getaddrinfo(hostname, port, type=socket.SOCK_STREAM)
+    return {item[4][0] for item in infos}
+
+
+def _security_headers(headers: dict[str, str]) -> dict[str, bool]:
+    return {
+        "strict_transport_security": "strict-transport-security" in headers,
+        "content_security_policy": "content-security-policy" in headers,
+        "x_content_type_options": "x-content-type-options" in headers,
+        "x_frame_options": "x-frame-options" in headers,
+        "referrer_policy": "referrer-policy" in headers,
+        "permissions_policy": "permissions-policy" in headers,
+    }
+
+
+def _tls_evidence(hostname: str, port: int) -> Evidence:
+    context = ssl.create_default_context()
+    try:
+        with socket.create_connection((hostname, port), timeout=8) as raw:
+            with context.wrap_socket(raw, server_hostname=hostname) as tls:
+                cert = tls.getpeercert()
+                return Evidence(source="tls", target=hostname, data={
+                    "version": tls.version(),
+                    "cipher": tls.cipher()[0] if tls.cipher() else None,
+                    "subject": cert.get("subject"),
+                    "issuer": cert.get("issuer"),
+                    "not_before": cert.get("notBefore"),
+                    "not_after": cert.get("notAfter"),
+                })
+    except (OSError, ssl.SSLError) as exc:
+        return Evidence(source="tls", target=hostname, data={"error": str(exc)}, confidence=0.2)
 
 
 def collect_domain(target: str) -> list[Evidence]:
     domain = normalize_target(target, EntityType.DOMAIN)
     results: list[Evidence] = []
     try:
-        infos = socket.getaddrinfo(domain, None, type=socket.SOCK_STREAM)
-        ips = sorted({item[4][0] for item in infos})
+        ips = sorted(_resolve_public(domain, 443))
         public_ips = [ip for ip in ips if _public_ip(ip)]
         results.append(Evidence(source="system-dns", target=domain, data={"addresses": public_ips}))
     except socket.gaierror as exc:
         results.append(Evidence(source="system-dns", target=domain, data={"error": str(exc)}, confidence=0.2))
-
     try:
-        with urllib.request.urlopen(
-            urllib.request.Request(f"https://rdap.org/domain/{domain}", headers={"User-Agent": USER_AGENT}),
-            timeout=8,
-        ) as response:
+        with urllib.request.urlopen(urllib.request.Request(f"https://rdap.org/domain/{domain}", headers={"User-Agent": USER_AGENT}), timeout=8) as response:
             body = response.read(256_000).decode("utf-8", errors="replace")
             results.append(Evidence(source="rdap.org", target=domain, data={"status": response.status, "raw": body[:20_000]}))
     except (urllib.error.URLError, TimeoutError, ValueError) as exc:
@@ -62,11 +89,9 @@ def collect_ip(target: str) -> list[Evidence]:
     try:
         ipaddress.ip_address(value)
     except ValueError:
-        return [Evidence(source="validator", target=value, data={"valid_ip": False}, confidence=1.0)]
-
+        return [Evidence(source="validator", target=value, data={"valid_ip": False})]
     if not _public_ip(value):
-        return [Evidence(source="scope", target=value, data={"public_routable": False}, notes="Private, reserved, or special-use address." )]
-
+        return [Evidence(source="scope", target=value, data={"public_routable": False}, notes="Private, reserved, or special-use address.")]
     hostname = None
     try:
         hostname = socket.gethostbyaddr(value)[0]
@@ -79,24 +104,24 @@ def collect_url(target: str) -> list[Evidence]:
     url = normalize_target(target, EntityType.URL)
     parsed = urlparse(url)
     if parsed.scheme not in {"http", "https"} or not parsed.hostname:
-        return [Evidence(source="validator", target=url, data={"valid_url": False}, confidence=1.0)]
-
+        return [Evidence(source="validator", target=url, data={"valid_url": False})]
+    port = parsed.port or (443 if parsed.scheme == "https" else 80)
     try:
-        addresses = {item[4][0] for item in socket.getaddrinfo(parsed.hostname, parsed.port or 443, type=socket.SOCK_STREAM)}
-    except socket.gaierror as exc:
+        addresses = _resolve_public(parsed.hostname, port)
+    except (socket.gaierror, OSError, ValueError) as exc:
         return [Evidence(source="url-preflight", target=url, data={"error": str(exc)}, confidence=0.2)]
-
     if not addresses or not all(_public_ip(address) for address in addresses):
-        return [Evidence(source="scope", target=url, data={"blocked": True, "reason": "hostname resolves to non-public address"}, confidence=1.0)]
-
+        return [Evidence(source="scope", target=url, data={"blocked": True, "reason": "hostname resolves to non-public address"})]
     request = urllib.request.Request(url, method="HEAD", headers={"User-Agent": USER_AGENT})
     try:
         with urllib.request.urlopen(request, timeout=8) as response:
             headers = {k.lower(): v for k, v in response.headers.items()}
-            tls = parsed.scheme == "https"
-            return [Evidence(source="http-head", target=url, data={"status": response.status, "final_url": response.geturl(), "headers": headers, "https": tls})]
+            evidence = [Evidence(source="http-head", target=url, data={"status": response.status, "final_url": response.geturl(), "headers": headers, "https": parsed.scheme == "https", "security_headers": _security_headers(headers)})]
+            if parsed.scheme == "https":
+                evidence.append(_tls_evidence(parsed.hostname, port))
+            return evidence
     except urllib.error.HTTPError as exc:
-        return [Evidence(source="http-head", target=url, data={"status": exc.code, "headers": dict(exc.headers.items())}, confidence=0.8)]
+        return [Evidence(source="http-head", target=url, data={"status": exc.code, "headers": dict(exc.headers.items()), "security_headers": _security_headers({k.lower(): v for k, v in exc.headers.items()})}, confidence=0.8)]
     except (urllib.error.URLError, TimeoutError) as exc:
         return [Evidence(source="http-head", target=url, data={"error": str(exc)}, confidence=0.2)]
 
@@ -119,4 +144,4 @@ def collect(target: str, target_type: EntityType) -> list[Evidence]:
         return collect_url(target)
     if target_type == EntityType.EMAIL:
         return collect_email(target)
-    return [Evidence(source="normalizer", target=normalize_target(target, target_type), data={"supported": False}, confidence=1.0)]
+    return [Evidence(source="normalizer", target=normalize_target(target, target_type), data={"supported": False})]
