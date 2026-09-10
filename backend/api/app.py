@@ -3,7 +3,7 @@ NEXUS-OSINT: API Router Assembly
 """
 from fastapi import APIRouter
 
-from .routes import graph, entities, transforms, agent
+from .routes import graph, entities, transforms, agent, osint
 
 
 def create_router() -> APIRouter:
@@ -12,4 +12,5 @@ def create_router() -> APIRouter:
     router.include_router(entities.router, prefix="/entities", tags=["Entities"])
     router.include_router(transforms.router, prefix="/transforms", tags=["Transforms"])
     router.include_router(agent.router, prefix="/agent", tags=["Agent"])
+    router.include_router(osint.router, prefix="/osint", tags=["OSINT"])
     return router
