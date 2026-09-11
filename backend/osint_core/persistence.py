@@ -28,6 +28,12 @@ class Database:
    CREATE TABLE IF NOT EXISTS entities(id TEXT PRIMARY KEY,case_id TEXT NOT NULL,entity_type TEXT NOT NULL,canonical TEXT NOT NULL,fingerprint TEXT NOT NULL,first_seen TEXT NOT NULL,last_seen TEXT NOT NULL,metadata_json TEXT NOT NULL,UNIQUE(case_id,entity_type,fingerprint),FOREIGN KEY(case_id) REFERENCES cases(id) ON DELETE CASCADE);
    CREATE INDEX IF NOT EXISTS idx_entities_case ON entities(case_id);
    CREATE TABLE IF NOT EXISTS relationships(id TEXT PRIMARY KEY,case_id TEXT NOT NULL,source_entity TEXT NOT NULL,target_entity TEXT NOT NULL,relation TEXT NOT NULL,confidence REAL NOT NULL,created_at TEXT NOT NULL,UNIQUE(case_id,source_entity,target_entity,relation),FOREIGN KEY(case_id) REFERENCES cases(id) ON DELETE CASCADE);
+   CREATE TABLE IF NOT EXISTS evidence_snapshots(id TEXT PRIMARY KEY,evidence_id TEXT NOT NULL,case_id TEXT NOT NULL,version INTEGER NOT NULL,created_at TEXT NOT NULL,actor TEXT NOT NULL,payload_json TEXT NOT NULL,payload_hash TEXT NOT NULL,UNIQUE(evidence_id,version),FOREIGN KEY(case_id) REFERENCES cases(id) ON DELETE CASCADE,FOREIGN KEY(evidence_id) REFERENCES evidence(id) ON DELETE CASCADE);
+   CREATE TABLE IF NOT EXISTS organizations(id TEXT PRIMARY KEY,name TEXT UNIQUE NOT NULL,created_at TEXT NOT NULL);
+   CREATE TABLE IF NOT EXISTS memberships(org_id TEXT NOT NULL,user_id TEXT NOT NULL,role TEXT NOT NULL,created_at TEXT NOT NULL,PRIMARY KEY(org_id,user_id),FOREIGN KEY(org_id) REFERENCES organizations(id) ON DELETE CASCADE,FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
+   CREATE TABLE IF NOT EXISTS saved_searches(id TEXT PRIMARY KEY,user_id TEXT NOT NULL,name TEXT NOT NULL,query_json TEXT NOT NULL,created_at TEXT NOT NULL,FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
+   CREATE TABLE IF NOT EXISTS pipeline_runs(id TEXT PRIMARY KEY,case_id TEXT NOT NULL,target TEXT NOT NULL,status TEXT NOT NULL,created_at TEXT NOT NULL,started_at TEXT,finished_at TEXT,steps_json TEXT NOT NULL,result_json TEXT NOT NULL,FOREIGN KEY(case_id) REFERENCES cases(id) ON DELETE CASCADE);
+   CREATE INDEX IF NOT EXISTS idx_pipeline_case ON pipeline_runs(case_id);
    """)
    cols={r[1] for r in db.execute("PRAGMA table_info(cases)").fetchall()}
    if "tags_json" not in cols: db.execute("ALTER TABLE cases ADD COLUMN tags_json TEXT NOT NULL DEFAULT '[]'")
