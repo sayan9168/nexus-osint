@@ -1,6 +1,6 @@
 """NEXUS-OSINT API router assembly."""
 from fastapi import APIRouter
-from .routes import graph,entities,transforms,agent,osint,cases,reports,graph_osint,platform,platform_ext,intelligence,case_io,workflow
+from .routes import graph,entities,transforms,agent,osint,cases,reports,graph_osint,platform,platform_ext,intelligence,case_io,workflow,v3
 
 def create_router():
  r=APIRouter()
@@ -17,4 +17,5 @@ def create_router():
  r.include_router(intelligence.router,prefix="/intelligence",tags=["Intelligence"])
  r.include_router(case_io.router,prefix="/cases",tags=["Case Import Export"])
  r.include_router(workflow.router,prefix="/workflow",tags=["Workflow"])
+ r.include_router(v3.router,prefix="/v3",tags=["NEXUS V3"])
  return r
