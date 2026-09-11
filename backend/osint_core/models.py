@@ -28,7 +28,7 @@ class Evidence(BaseModel):
 
 
 class Investigation(BaseModel):
-    id: str
+    id: str = Field(default_factory=lambda: str(uuid4()))
     target: str
     target_type: EntityType
     authorized: bool = False
