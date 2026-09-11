@@ -3,7 +3,7 @@ import os,tempfile
 
 def test_v3_module_compiles():
     import py_compile
-    py_compile.compile("backend/api/routes/v3.py",doraise=True)
+    py_compile.compile("api/routes/v3.py",doraise=True)
 
 def test_v3_schema_tables_initialize():
     from osint_core.persistence import Database
