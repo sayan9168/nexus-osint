@@ -22,6 +22,11 @@ export interface TransformInfo {
   description?: string;
 }
 
+export type WSMessage = {
+  type: "graph_snapshot" | "node_added" | "edge_added" | "transform_started" | "transform_completed" | "agent_update" | string;
+  data: any;
+};
+
 export const NODE_COLORS: Record<string, string> = {
   Domain: "#22d3ee",
   IP: "#60a5fa",
