@@ -1,497 +1,735 @@
 <div align="center">
 
-# 🌐 NEXUS-OSINT
+# NEXUS-OSINT
 
-### AI-Native OSINT & 3D Link Analysis Platform
+### Public-Source Intelligence, Investigation Graphs & Spatial Analysis
 
-**A next-generation, open-source alternative to Maltego — powered by AI agents, real-time 3D graph visualization, and autonomous investigation workflows.**
+A security-focused, open-source intelligence platform for authorized investigations. NEXUS-OSINT combines case management, evidence provenance, public-source collection, relationship analysis, 3D visualization, spatial intelligence, and reproducible reporting in one investigation workspace.
 
 [![License](https://img.shields.io/badge/License-Sayanox%20v1.1-cyan)](./LICENSE)
-[![Python](https://img.shields.io/badge/Python-3.11+-blue)](https://python.org)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688)](https://fastapi.tiangolo.com)
-[![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org)
-[![Memgraph](https://img.shields.io/badge/Memgraph-2.18-orange)](https://memgraph.com)
-[![LangGraph](https://img.shields.io/badge/LangGraph-Agent-purple)](https://github.com/langchain-ai/langgraph)
+[![Backend](https://img.shields.io/badge/Backend-FastAPI-009688)](https://fastapi.tiangolo.com/)
+[![Frontend](https://img.shields.io/badge/Frontend-Next.js-111111)](https://nextjs.org/)
+[![Language](https://img.shields.io/badge/Language-Python%203.11%2B-3776AB)](https://www.python.org/)
+[![Security](https://img.shields.io/badge/Focus-Authorized%20OSINT-0B7285)](./SECURITY.md)
 
-[Report Bug](https://github.com/sayan9168/nexus-osint/issues) · [Request Feature](https://github.com/sayan9168/nexus-osint/issues) · [Documentation](https://github.com/sayan9168/nexus-osint/wiki)
+**Investigate. Correlate. Preserve. Explain.**
+
+[Issues](https://github.com/sayan9168/nexus-osint/issues) · [Security Policy](./SECURITY.md) · [Documentation](./docs/)
 
 </div>
 
 ---
 
-## 📑 Table of Contents
+## Overview
 
-- [Overview](#-overview)
-- [Key Features](#-key-features)
-- [Architecture](#-architecture)
-- [Tech Stack](#-tech-stack)
-- [Quick Start](#-quick-start)
-- [Project Structure](#-project-structure)
-- [API Reference](#-api-reference)
-- [AI Agent](#-ai-recon-agent)
-- [3D Graph UI](#-3d-graph-ui)
-- [Transforms](#-transforms)
-- [Configuration](#-configuration)
-- [Development](#-development)
-- [Roadmap](#-roadmap)
-- [Contributing](#-contributing)
-- [License](#-license)
-- [Author](#-author)
+NEXUS-OSINT is an investigation platform built around a simple principle: **public intelligence should be collected with clear provenance, bounded execution, and an auditable chain of evidence**.
 
----
+The platform is designed for security researchers, defenders, investigators, analysts, students, and organizations performing legitimate research. It provides a persistent workspace where public signals can be collected, normalized, correlated, visualized, scored, reviewed, and exported.
 
-## 🔍 Overview
+NEXUS is intentionally not a private-account access tool, credential harvesting framework, exploitation platform, or covert people-tracking system.
 
-**NEXUS-OSINT** is a production-grade, AI-native Open Source Intelligence (OSINT) and 3D Link Analysis platform. It enables security researchers, threat analysts, and investigators to:
+### Core workflow
 
-- **Autonomously investigate** targets using AI-driven OSINT workflows
-- **Visualize complex relationships** in an interactive 3D WebGL graph (100,000+ nodes)
-- **Discover hidden correlations** between entities using semantic vector search
-- **Execute OSINT transforms** (DNS, WHOIS, VirusTotal, and custom) asynchronously
-- **Receive real-time updates** via WebSocket as the AI agent discovers new entities
-
-> ⚡ Built as a modern, open-source alternative to Maltego with first-class AI integration.
-
----
-
-## ✨ Key Features
-
-| Feature | Description |
-|---------|-------------|
-| 🤖 **Autonomous AI Agent** | LangGraph-powered agent that decides which OSINT transforms to run based on graph context |
-| 🌐 **3D Graph Visualization** | WebGL-powered force-directed graph rendering 100K+ nodes at 60 FPS |
-| ⚡ **Real-Time Streaming** | WebSocket-based live graph updates as entities are discovered |
-| 🔗 **Semantic Correlation** | Vector embeddings (Qdrant) to find hidden links between unrelated entity types |
-| 🔄 **Async Transform Engine** | Celery + Redis task queue for non-blocking OSINT data collection |
-| 📊 **In-Memory Graph DB** | Memgraph (Cypher) for ultra-fast node/relationship queries |
-| 🛡️ **Threat Intelligence** | VirusTotal integration for reputation checks and IOC discovery |
-| 🏗️ **Production-Grade** | Docker orchestration, rate limiting, retry logic, structured logging |
-
----
-
-## 🏗 Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        NEXUS-OSINT Platform                          │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                       │
-│  ┌──────────────┐    WebSocket     ┌──────────────────────────────┐  │
-│  │  Next.js 3D  │◄────────────────►│     FastAPI Backend           │  │
-│  │  Frontend    │    REST API      │  ┌────────────────────────┐  │  │
-│  │  (WebGL)     │◄────────────────►│  │  /api/v1/graph         │  │  │
-│  │  Port:3001   │                  │  │  /api/v1/entities      │  │  │
-│  └──────────────┘                  │  │  /api/v1/transforms    │  │  │
-│                                    │  │  /api/v1/agent         │  │  │
-│                                    │  │  /ws/graph (WebSocket) │  │  │
-│                                    │  └────────────────────────┘  │  │
-│                                    └──────┬───────────┬───────────┘  │
-│                                           │           │              │
-│                              ┌────────────┘           └────────┐     │
-│                              ▼                                  ▼     │
-│  ┌──────────────────────────────────┐  ┌─────────────────────┐      │
-│  │     Memgraph (Graph DB)          │  │   Qdrant (Vector)   │      │
-│  │     In-Memory Cypher             │  │   Semantic Search    │      │
-│  │     Port: 7687                   │  │   Port: 6333         │      │
-│  └──────────────────────────────────┘  └─────────────────────┘      │
-│                                                                       │
-│  ┌──────────────────────────────────────────────────────────────┐    │
-│  │              Celery Workers + Redis Broker                     │    │
-│  │  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌──────────────┐   │    │
-│  │  │DNS      │  │WHOIS    │  │VirusTotal│  │  Custom      │   │    │
-│  │  │Transform│  │Transform│  │Transform │  │  Transforms  │   │    │
-│  │  └─────────┘  └─────────┘  └─────────┘  └──────────────┘   │    │
-│  └──────────────────────────────────────────────────────────────┘    │
-│                                                                       │
-│  ┌──────────────────────────────────────────────────────────────┐    │
-│  │              AI Recon Agent (LangGraph)                        │    │
-│  │  Plan (LLM) → Execute Tools → Correlate (Vector) → Report    │    │
-│  └──────────────────────────────────────────────────────────────┘    │
-│                                                                       │
-└─────────────────────────────────────────────────────────────────────┘
+```text
+Target / Case
+      │
+      ▼
+Public Sources ──► Collectors ──► Normalization
+      │                               │
+      │                               ▼
+      │                         Deduplication
+      │                               │
+      ▼                               ▼
+Evidence ◄──────────────► Entities & Relationships
+      │                               │
+      ▼                               ▼
+Evidence Snapshots              Investigation Graph
+      │                               │
+      └──────────────┬────────────────┘
+                     ▼
+              Timeline + Scoring
+                     │
+                     ▼
+             Spatial Intelligence
+                     │
+                     ▼
+          Reports / JSON / Case Bundle
 ```
 
 ---
 
-## 🛠 Tech Stack
+## Highlights
 
-| Layer | Technology |
-|-------|-----------|
-| **Backend** | Python 3.11+, FastAPI (AsyncIO), Pydantic v2 |
-| **Graph Database** | Memgraph 2.18 (In-Memory Cypher) |
-| **Vector Database** | Qdrant 1.9 (Semantic Search & Identity Matching) |
-| **Task Queue** | Celery 5.4 + Redis 7.2 |
-| **AI Agent** | LangGraph + LangChain + LLM (Qwen / Claude) |
-| **Frontend** | Next.js 14, TypeScript, Tailwind CSS |
-| **3D Rendering** | 3d-force-graph (WebGL / Three.js) |
-| **State Management** | Zustand |
-| **Orchestration** | Docker & Docker Compose |
-| **Logging** | structlog (structured JSON logging) |
+### Investigation Workspace
+
+- Persistent cases with status, tags, workflow state, and authorization metadata
+- Targets, notes, evidence, audit events, and investigation history
+- Case-aware workspace navigation
+- Evidence provenance and deterministic fingerprints
+- JSON case bundle export/import
+
+### Intelligence & Correlation
+
+- DNS and RDAP intelligence
+- Entity and relationship modeling
+- Idempotent relationship merging
+- Public-source signal normalization
+- Confidence scoring
+- Signal fingerprinting and deduplication
+- Correlated spatial context
+- Investigation graph analysis
+- Timeline reconstruction
+
+### Spatial Intelligence
+
+The Spatial Intelligence workspace combines public geographic, environmental, infrastructure, transport, aviation, maritime, space, and event data where the corresponding source is available and permitted.
+
+Current source families include:
+
+| Source | Intelligence |
+|---|---|
+| OpenSky | Public aircraft data |
+| USGS | Earthquake and earth-science events |
+| NASA EONET | Natural-event feeds |
+| CelesTrak | Public satellite orbital catalog data |
+| Launch Library 2 | Public launch/event data |
+| Radio Browser | Public geolocated radio metadata |
+| GDELT | Public open-web geographic event signals |
+| OpenStreetMap / Overpass | Public geographic and infrastructure context |
+| Nominatim | Reverse geocoding |
+| Open-Meteo | Weather and environmental context |
+| NOAA | Public weather and alert data |
+| RIPE Atlas | Public Internet measurement/probe metadata |
+| RIPEstat | Public Internet and network intelligence |
+| NASA FIRMS | Fire data when configured/available |
+| AISStream | Maritime data when configured/available |
+| Public feed adapters | Authorized/configured traffic and camera metadata |
+
+Availability, rate limits, API keys, attribution requirements, and provider terms vary by source. NEXUS does not claim that every source is continuously available.
+
+### 3D Investigation Interface
+
+- Interactive Three.js globe
+- Orbit and cockpit-style viewing modes
+- Signal focus/tracking
+- Layer visibility controls
+- Sensor-style visual presets
+- Tactical HUD and detection overlays
+- Scene director
+- Browser-based investigation whiteboard
+- Shareable view state
+- Case evidence visualization
+- Spatial source registry
+
+The spatial module models **events, infrastructure, geographic context, and public signals**. It does not provide facial recognition or covert named-person tracking.
+
+### Evidence & Auditability
+
+NEXUS treats evidence as a first-class object.
+
+Each investigation can preserve:
+
+- Source
+- Target
+- Observed data
+- Timestamp
+- Confidence
+- Evidence payload
+- Provenance hash
+- Evidence snapshots
+- Actor/audit information
+- Relationship context
+
+This makes an investigation easier to reproduce, review, and explain instead of presenting an opaque collection of search results.
+
+### Authentication & Authorization
+
+The platform includes:
+
+- Persistent user accounts
+- JWT authentication
+- Role-based access control
+- Viewer / Analyst / Admin roles
+- Permission-aware API routes
+- Case authorization checks
+- Audit logging
+- Security-focused request controls
+
+### Resilience & Operations
+
+- Persistent background jobs
+- Bounded worker concurrency
+- Retry and cancellation state
+- Optional Redis/Celery execution
+- Structured logging
+- CORS allowlisting
+- Request-size controls
+- Rate limiting
+- Security headers and CSP
+- Public-address/SSRF preflight controls for network collectors
+- Health and platform metrics endpoints
 
 ---
 
-## 🚀 Quick Start
+## Architecture
 
-### Prerequisites
+```text
+┌──────────────────────────────────────────────────────────────────┐
+│                         NEXUS-OSINT                              │
+├──────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────────────────┐        ┌───────────────────────────┐  │
+│  │ Next.js Investigation│ REST   │ FastAPI Investigation API │  │
+│  │ Workspace + 3D Globe │◄──────►│ Auth / RBAC / Cases       │  │
+│  └──────────────────────┘        └─────────────┬─────────────┘  │
+│                                               │                 │
+│                     ┌─────────────────────────┼────────────┐    │
+│                     ▼                         ▼            ▼    │
+│             ┌──────────────┐        ┌──────────────┐ ┌────────┐│
+│             │ OSINT Core   │        │ Spatial Core │ │ Jobs   ││
+│             │ DNS / RDAP   │        │ Public Feeds │ │ Celery ││
+│             │ Cases / Graph│        │ Context/Fusion│ │ Redis  ││
+│             └──────┬───────┘        └──────┬───────┘ └────────┘│
+│                    │                       │                    │
+│                    └──────────┬────────────┘                    │
+│                               ▼                                 │
+│                    ┌────────────────────┐                       │
+│                    │ Persistence Layer  │                       │
+│                    │ Cases / Evidence   │                       │
+│                    │ Entities / Audit   │                       │
+│                    │ Jobs / Snapshots   │                       │
+│                    └────────────────────┘                       │
+│                                                                  │
+└──────────────────────────────────────────────────────────────────┘
+```
 
-- Docker & Docker Compose v2.20+
-- 8GB+ RAM (Memgraph is in-memory)
-- (Optional) Ollama for local LLM inference
+The repository also contains extension foundations for plugins, workflows, analytics, reporting, organizations, saved searches, and durable investigation pipelines.
 
-### 1. Clone the Repository
+---
+
+## Technology
+
+| Area | Technology |
+|---|---|
+| API | FastAPI / Python 3.11+ |
+| Validation | Pydantic |
+| HTTP | HTTPX |
+| Database | SQLite persistence layer with WAL/foreign-key support |
+| Jobs | ThreadPoolExecutor with optional Celery + Redis |
+| Authentication | JWT + password hashing |
+| Frontend | Next.js + TypeScript |
+| 3D | Three.js |
+| Logging | Structured logging |
+| Deployment | Docker / Docker Compose |
+| CI | GitHub Actions |
+
+The architecture is intentionally modular so optional infrastructure can be introduced without making the core investigation workflow dependent on a paid external service.
+
+---
+
+## Project Structure
+
+```text
+nexus-osint/
+├── backend/
+│   ├── main.py
+│   ├── api/
+│   │   ├── app.py
+│   │   ├── routes/
+│   │   │   ├── auth.py
+│   │   │   ├── cases.py
+│   │   │   ├── intelligence.py
+│   │   │   ├── reports.py
+│   │   │   ├── spatial.py
+│   │   │   ├── spatial_fusion.py
+│   │   │   ├── v3.py
+│   │   │   └── ...
+│   │   └── security.py
+│   ├── osint_core/
+│   │   ├── auth.py
+│   │   ├── audit.py
+│   │   ├── cases.py
+│   │   ├── collectors.py
+│   │   ├── dedup.py
+│   │   ├── graph.py
+│   │   ├── intelligence.py
+│   │   ├── jobs.py
+│   │   ├── persistence.py
+│   │   ├── plugins.py
+│   │   ├── public_sources.py
+│   │   ├── scoring.py
+│   │   ├── source_fusion.py
+│   │   ├── spatial.py
+│   │   └── timeline.py
+│   └── tests/
+│
+├── frontend/
+│   └── src/
+│       ├── app/
+│       │   ├── page.tsx
+│       │   ├── spatial/
+│       │   └── ...
+│       └── lib/
+│
+├── docs/
+├── .github/
+│   └── workflows/
+├── docker-compose.production.yml
+├── .env.example
+├── CHANGELOG.md
+├── LICENSE
+└── README.md
+```
+
+---
+
+## Quick Start
+
+### Requirements
+
+- Python 3.11+
+- Node.js 18+
+- npm
+- Git
+- Docker and Docker Compose are recommended for production-style deployment
+
+### Clone
 
 ```bash
 git clone https://github.com/sayan9168/nexus-osint.git
 cd nexus-osint
 ```
 
-### 2. Configure Environment
+### Backend
 
 ```bash
-cp .env.example .env
-```
-
-Edit `.env` with your API keys:
-
-```env
-VIRUSTOTAL_API_KEY=your_vt_key_here
-LLM_API_KEY=your_llm_key_here
-LLM_BASE_URL=http://localhost:11434/v1
-LLM_MODEL=qwen2.5:72b
-```
-
-### 3. Build & Launch
-
-```bash
-# Build all containers
-docker compose build --no-cache
-
-# Start all services
-docker compose up -d
-```
-
-### 4. Access the Platform
-
-| Service | URL |
-|---------|-----|
-| 🌐 **3D Graph Dashboard** | http://localhost:3001 |
-| 🔌 **Backend API** | http://localhost:8000 |
-| 📖 **API Docs (Swagger)** | http://localhost:8000/docs |
-| 🤖 **AI Agent Service** | http://localhost:8001 |
-| 🗄️ **Memgraph Lab** | http://localhost:3000 |
-| 📐 **Qdrant Dashboard** | http://localhost:6333/dashboard |
-
-### 5. Verify Installation
-
-```bash
-# Health check
-curl http://localhost:8000/health
-
-# Run a DNS transform
-curl -X POST http://localhost:8000/api/v1/transforms/execute \
-  -H "Content-Type: application/json" \
-  -d '{"transform_name": "dns_resolution", "entity_type": "Domain", "entity_value": "example.com"}'
-
-# Trigger AI investigation
-curl -X POST http://localhost:8000/api/v1/agent/investigate \
-  -H "Content-Type: application/json" \
-  -d '{"target": "suspicious-domain.com", "goal": "Identify all associated infrastructure"}'
-```
-
----
-
-## 📁 Project Structure
-
-```
-nexus-osint/
-├── docker-compose.yml          # Service orchestration
-├── .env.example                # Environment template
-├── Makefile                    # Build/run shortcuts
-├── README.md
-├── LICENSE
-├── .gitignore
-│
-├── backend/                    # FastAPI + Transforms + Workers
-│   ├── main.py                 # App entry point
-│   ├── config.py               # Centralized settings
-│   ├── db/                     # Memgraph + Qdrant clients
-│   ├── transforms/             # OSINT transform engine
-│   ├── api/                    # REST + WebSocket routes
-│   └── workers/                # Celery task definitions
-│
-├── agent/                      # AI Recon Agent (LangGraph)
-│   ├── recon_agent.py          # Main agent workflow
-│   ├── tools.py                # LLM tool definitions
-│   ├── state.py                # LangGraph state schema
-│   ├── correlation.py          # Semantic correlation engine
-│   └── prompts.py              # System prompts
-│
-├── frontend/                   # Next.js 3D Dashboard
-│   └── src/
-│       ├── components/         # Graph3D, Sidebar, AgentPanel
-│       ├── hooks/              # useWebSocket, useGraphData
-│       ├── store/              # Zustand state
-│       └── lib/                # API client, types
-│
-└── docker/                     # Init scripts & configs
-    ├── memgraph/init.cypher
-    ├── redis/redis.conf
-    └── nginx/nginx.conf
-```
-
----
-
-## 📡 API Reference
-
-### Graph Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/v1/graph/full` | Retrieve full graph (nodes + edges) |
-| `GET` | `/api/v1/graph/neighbors` | Get entity neighbors by depth |
-| `GET` | `/api/v1/graph/summary` | Graph statistics summary |
-| `POST` | `/api/v1/graph/nodes` | Create a new node |
-| `POST` | `/api/v1/graph/edges` | Create a new edge |
-| `POST` | `/api/v1/graph/query` | Execute raw Cypher query |
-| `POST` | `/api/v1/graph/correlate` | Semantic correlation search |
-| `DELETE` | `/api/v1/graph/nodes/{id}` | Delete node + relationships |
-
-### Entity Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/v1/entities/` | List entities (paginated) |
-| `GET` | `/api/v1/entities/{id}` | Get single entity |
-| `POST` | `/api/v1/entities/` | Create entity |
-| `PUT` | `/api/v1/entities/{id}` | Update entity |
-| `DELETE` | `/api/v1/entities/{id}` | Delete entity |
-| `POST` | `/api/v1/entities/search` | Full-text search |
-
-### Transform Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/v1/transforms/` | List available transforms |
-| `POST` | `/api/v1/transforms/execute` | Execute transform (sync/async) |
-| `GET` | `/api/v1/transforms/status/{id}` | Check async task status |
-
-### Agent Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/v1/agent/investigate` | Launch AI investigation |
-| `GET` | `/api/v1/agent/health` | Agent service health |
-
-### WebSocket
-
-| Endpoint | Description |
-|----------|-------------|
-| `ws://host:8000/ws/graph` | Real-time graph updates stream |
-
----
-
-## 🤖 AI Recon Agent
-
-The autonomous investigation agent uses **LangGraph** to orchestrate a tool-calling loop:
-
-```
-┌────────┐     ┌───────────────┐     ┌─────────────┐     ┌────────┐
-│  PLAN  │────►│ EXECUTE TOOLS │────►│  CORRELATE  │────►│ REPORT │
-│ (LLM)  │◄────│   (OSINT)     │◄────│  (Vector)   │     │        │
-└────────┘     └───────────────┘     └─────────────┘     └────────┘
-```
-
-**Available Tools:**
-- `run_dns_resolution` — DNS record discovery
-- `run_whois_lookup` — Domain ownership intelligence
-- `run_virustotal_lookup` — Threat reputation & IOC extraction
-- `query_graph_neighbors` — Knowledge graph traversal
-- `find_semantic_correlations` — Hidden link discovery via embeddings
-- `get_investigation_summary` — Current state overview
-
----
-
-## 🌐 3D Graph UI
-
-The frontend renders an interactive 3D force-directed graph using **WebGL** (Three.js):
-
-- **100,000+ nodes** rendered at 60 FPS with GPU acceleration
-- **Color-coded entities** by type (Domain, IP, Email, Hash, Wallet, Person, etc.)
-- **Animated particles** flowing along edges to show relationship direction
-- **Click-to-inspect** any node for full metadata
-- **Real-time updates** via WebSocket as the AI agent discovers entities
-- **Filter panel** to toggle entity type visibility
-- **AI Agent panel** to launch investigations and view reports
-
----
-
-## 🔄 Transforms
-
-| Transform | Input | Output | Description |
-|-----------|-------|--------|-------------|
-| `dns_resolution` | Domain | IP, Domain, Email | Resolves A, AAAA, MX, NS, TXT records |
-| `whois_lookup` | Domain | Domain, Email, Person | Retrieves registration data |
-| `virustotal_lookup` | Domain/IP/Hash | IP, Domain, Hash, Email | Threat intelligence & IOCs |
-
-**Custom transforms** can be added by extending `BaseTransform`:
-
-```python
-from transforms.base import BaseTransform
-from db.schemas import NodeLabel, TransformResult
-
-class MyCustomTransform(BaseTransform):
-    name = "my_transform"
-    description = "Does something useful"
-    input_type = NodeLabel.DOMAIN
-    output_types = [NodeLabel.IP]
-
-    async def execute(self, entity_value, parameters=None):
-        # Your logic here
-        return TransformResult(
-            transform_name=self.name,
-            status="success",
-            new_nodes=[...],
-            new_edges=[...],
-        )
-```
-
----
-
-## ⚙️ Configuration
-
-All configuration is managed via environment variables (see `.env.example`):
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `MEMGRAPH_HOST` | `localhost` | Memgraph server host |
-| `MEMGRAPH_PORT` | `7687` | Memgraph Bolt port |
-| `REDIS_URL` | `redis://localhost:6379/0` | Redis connection |
-| `QDRANT_HOST` | `localhost` | Qdrant server host |
-| `QDRANT_PORT` | `6333` | Qdrant HTTP port |
-| `VIRUSTOTAL_API_KEY` | — | VirusTotal API key |
-| `LLM_API_KEY` | — | LLM provider API key |
-| `LLM_BASE_URL` | `http://localhost:11434/v1` | LLM endpoint |
-| `LLM_MODEL` | `qwen2.5:72b` | Model identifier |
-
----
-
-## 💻 Development
-
-### Local Development (without Docker)
-
-```bash
-# Backend
 cd backend
-python -m venv venv && source venv/bin/activate
+python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
-uvicorn main:app --reload --port 8000
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
 
-# Celery Worker
-celery -A workers.celery_app worker --loglevel=info
+### Frontend
 
-# Agent
-cd agent
-pip install -r requirements.txt
-python recon_agent.py
+In another terminal:
 
-# Frontend
+```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-### Running Tests
+The frontend normally runs on the Next.js development port shown by the terminal. Configure the backend URL through `NEXT_PUBLIC_API_URL` when required.
+
+### Environment
+
+Start from the supplied template:
+
+```bash
+cp .env.example .env
+```
+
+Important settings include JWT configuration, CORS origins, database location, optional Redis/Celery settings, and optional public-source credentials.
+
+Never commit secrets to Git.
+
+---
+
+## Docker
+
+For a production-style local environment:
+
+```bash
+docker compose -f docker-compose.production.yml up --build
+```
+
+For a Celery worker when Redis/Celery execution is enabled:
+
+```bash
+celery -A osint_core.jobs worker --loglevel=INFO --concurrency=2
+```
+
+Review the deployment documentation and environment template before exposing the service to an untrusted network.
+
+---
+
+## Investigation Workflow
+
+A recommended workflow is:
+
+1. Create a case.
+2. Mark the case as authorized for the intended investigation.
+3. Add one or more public targets.
+4. Run bounded collectors.
+5. Review returned evidence and provenance.
+6. Inspect entities and relationships.
+7. Open the Investigation Graph.
+8. Open Spatial Intelligence for geographic signals and context.
+9. Review timeline and confidence scoring.
+10. Preserve important evidence snapshots.
+11. Export a report or case bundle.
+12. Review the audit trail before sharing results.
+
+See `docs/INVESTIGATION_WORKFLOW.md` and `docs/SECURITY_BOUNDARIES.md` for operational guidance.
+
+---
+
+## API Surface
+
+The API is organized into versioned functional areas.
+
+### Authentication
+
+```text
+/api/v1/auth/register
+/api/v1/auth/login
+/api/v1/auth/me
+```
+
+### Cases & Evidence
+
+```text
+/api/v1/cases/...
+/api/v1/reports/...
+/api/v1/cases/{case_id}/bundle.json
+/api/v1/cases/import
+```
+
+### Intelligence
+
+```text
+/api/v1/intelligence/dns-rdap
+/api/v1/intelligence/entities/{case_id}
+/api/v1/intelligence/relationships
+```
+
+### Platform
+
+```text
+/api/v1/platform/health
+/api/v1/platform/sources
+/api/v1/platform/cases/{case_id}/timeline
+/api/v1/platform/cases/{case_id}/score
+/api/v1/platform/cases/{case_id}/export.json
+/api/v1/platform/jobs
+/api/v1/platform/metrics
+```
+
+### V3
+
+```text
+/api/v1/v3/search
+/api/v1/v3/search/saved
+/api/v1/v3/analytics/{case_id}
+/api/v1/v3/entities/correlate/{case_id}
+/api/v1/v3/graph/{case_id}/analysis
+/api/v1/v3/evidence/{evidence_id}/snapshot
+/api/v1/v3/pipelines/{case_id}
+/api/v1/v3/orgs
+/api/v1/v3/replay/{case_id}
+```
+
+### Spatial Intelligence
+
+```text
+/api/v1/v3/spatial/layers
+/api/v1/v3/spatial/sources
+/api/v1/v3/spatial/context
+/api/v1/v3/spatial/cases/{case_id}/points
+/api/v1/v3/spatial/fusion
+/api/v1/v3/spatial/fusion/context
+```
+
+Exact schemas and authentication requirements should be treated as authoritative in the running OpenAPI documentation.
+
+---
+
+## Public Source Model
+
+NEXUS uses a source-registry approach rather than hard-coding a single intelligence provider.
+
+Each source can carry metadata such as:
+
+- Source identifier
+- Display name
+- Category
+- Access model
+- Availability
+- Rate-limit expectations
+- Optional configuration requirements
+- Attribution requirements
+- Collection status
+
+The long-term architecture is designed around:
+
+```text
+Source Adapter
+     ↓
+Normalized Signal
+     ↓
+Validation
+     ↓
+Fingerprint / Dedup
+     ↓
+Confidence
+     ↓
+Evidence
+     ↓
+Entity / Relationship
+     ↓
+Timeline / Graph / Spatial View
+```
+
+This allows additional public datasets and APIs to be integrated without redesigning the investigation model.
+
+---
+
+## Spatial Intelligence Design
+
+Spatial signals are intentionally separated into layers so analysts can inspect source provenance and avoid treating every point as ground truth.
+
+Examples include:
+
+- Aircraft
+- Earthquakes
+- Satellites
+- Launches
+- Radio stations
+- Natural events
+- Open-web geographic events
+- Case evidence
+- Maritime signals when configured
+- Traffic data when configured
+- Public camera metadata when configured
+- Fire data when configured
+- Internet measurement probes
+
+### Satellite positioning
+
+The spatial architecture supports public orbital catalog integration. Live geographic propagation should be treated as derived data: the source orbital elements are preserved, propagation parameters are explicit, and derived positions are not represented as authoritative observations.
+
+---
+
+## Security Model
+
+NEXUS is designed for **authorized, public-source intelligence work**.
+
+### Included safeguards
+
+- JWT authentication
+- RBAC permissions
+- Case authorization checks
+- Audit logging
+- Evidence provenance
+- Hash-based evidence snapshots
+- Bounded network timeouts
+- Result-size limits
+- Request-size controls
+- Rate limiting
+- CORS allowlisting
+- Security headers/CSP
+- SSRF/public-address preflight for applicable collectors
+- Explicit public-source boundaries
+
+### Explicitly out of scope
+
+NEXUS does not provide features intended to:
+
+- Steal passwords, API keys, tokens, or sessions
+- Bypass authentication or access controls
+- Access private accounts or private datasets without authorization
+- Exploit vulnerable systems
+- Evade detection or conceal malicious activity
+- Perform covert surveillance
+- Perform facial recognition or named-person spatial tracking
+- Conduct indiscriminate mass profiling
+
+If a source requires authorization, an API key, an account, or contractual access, it is treated as an optional/configured source rather than falsely presented as unrestricted public access.
+
+See `SECURITY.md` and `docs/SECURITY_BOUNDARIES.md`.
+
+---
+
+## Data Provenance
+
+A central design goal is reproducibility.
+
+For important observations, NEXUS can retain source and timing metadata together with normalized evidence. Evidence snapshots provide versioned representations so an analyst can distinguish:
+
+```text
+What the source returned
+        ↓
+What NEXUS normalized
+        ↓
+What relationship was inferred
+        ↓
+What the analyst concluded
+```
+
+This distinction is important because **correlation is not proof**. Confidence scores are analytical aids, not guarantees of truth.
+
+---
+
+## Reporting
+
+Supported report formats include:
+
+- Markdown
+- HTML
+- JSON
+- Case bundle JSON for portable investigations
+
+Reports are intended to preserve enough context for another analyst to understand the evidence, sources, timestamps, relationships, and limitations behind a conclusion.
+
+---
+
+## Plugin & Extension Model
+
+NEXUS includes a plugin foundation with metadata for:
+
+- Plugin identity and version
+- Entity types
+- Description
+- Required permissions
+- Source declarations
+- Scope
+- Timeout
+- Rate limit
+- Compatibility
+- Health checks
+- Author metadata
+
+Future extensions can build source adapters, transforms, enrichment modules, and visualization providers without coupling them to the core case model.
+
+Production deployments should add appropriate sandboxing and signature verification before accepting untrusted third-party plugins.
+
+---
+
+## Development
+
+Run backend tests from the backend directory:
 
 ```bash
 cd backend
-pytest tests/ -v --cov=.
-
-cd frontend
-npm run lint
+pytest -q
 ```
 
-### Makefile Commands
+Compile-check Python modules when making low-level changes:
 
 ```bash
-make up          # Start all services
-make down        # Stop all services
-make build       # Rebuild containers
-make logs        # Tail all logs
-make clean       # Full cleanup (volumes + images)
-make restart     # Restart all
+python -m compileall -q .
 ```
 
----
+Frontend:
 
-## 🗺 Roadmap
-
-- [ ] Shodan / Censys integration transforms
-- [ ] Blockchain explorer transforms (Etherscan, Blockchain.com)
-- [ ] Dark web forum crawler (Tor-based)
-- [ ] Multi-user authentication (JWT + RBAC)
-- [ ] Graph export (GraphML, GEXF, JSON)
-- [ ] Timeline view for temporal analysis
-- [ ] Collaborative investigation sessions
-- [ ] Plugin marketplace for community transforms
-- [ ] Kubernetes Helm chart for cloud deployment
-- [ ] Mobile-responsive graph viewer
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. **Commit** your changes (`git commit -m 'feat: add amazing feature'`)
-4. **Push** to the branch (`git push origin feature/amazing-feature`)
-5. **Open** a Pull Request
-
-### Commit Convention
-
-```
-feat:     New feature
-fix:      Bug fix
-docs:     Documentation update
-refactor: Code refactoring
-test:     Adding tests
-chore:    Maintenance tasks
+```bash
+cd frontend
+npm install
+npm run build
 ```
 
----
-
-## 📜 License
-
-This project is licensed under the **Sayanox License v1.1**.
-
-See the [LICENSE](./LICENSE) file for full terms and conditions.
+GitHub Actions provides the repository CI workflow for automated validation. A local green build is not a substitute for reviewing deployment configuration, provider limits, and security controls.
 
 ---
 
-## 👤 Author
+## Operational Principles
+
+NEXUS follows these principles:
+
+1. **Public by default, private by explicit authorization.**
+2. **Every important observation should have provenance.**
+3. **Derived intelligence must be distinguishable from source observations.**
+4. **Correlation must not be presented as certainty.**
+5. **Network collection must be bounded and SSRF-aware.**
+6. **Provider terms, attribution, and rate limits matter.**
+7. **Case authorization is part of the workflow, not an afterthought.**
+8. **Sensitive capabilities should be excluded rather than hidden behind vague labels.**
+
+---
+
+## Roadmap
+
+### Intelligence Platform
+
+- [x] Persistent investigation cases
+- [x] Evidence provenance and snapshots
+- [x] Investigation graph
+- [x] Timeline and scoring
+- [x] Authentication and RBAC
+- [x] Durable background jobs
+- [x] Case import/export
+- [x] Public source registry
+- [x] Public signal fusion
+
+### Spatial Platform
+
+- [x] 3D globe
+- [x] Aircraft and earthquake layers
+- [x] Public natural-event layers
+- [x] Satellite catalog integration
+- [x] Launch and radio layers
+- [x] Geographic context lookup
+- [x] Spatial signal fusion
+- [x] Source registry
+- [ ] Satellite orbital propagation and live derived positions
+- [ ] Signal-density heatmaps
+- [ ] Advanced temporal playback
+- [ ] Source health dashboard
+- [ ] Automated spatial clustering
+
+### Platform
+
+- [x] Role-based access control
+- [x] Audit chain
+- [x] Structured logging
+- [x] Rate limiting
+- [x] Security headers
+- [x] Docker deployment foundation
+- [ ] Distributed rate limiting
+- [ ] Prometheus/OpenTelemetry observability
+- [ ] Hardened plugin sandbox
+- [ ] Signed plugin marketplace
+
+Roadmap items are engineering targets, not claims of current availability.
+
+---
+
+## Contributing
+
+Contributions are welcome when they improve reliability, documentation, source coverage, security, usability, or investigation quality.
+
+Before submitting a change:
+
+1. Keep public-source integrations bounded and documented.
+2. Preserve provenance and attribution metadata.
+3. Add or update tests for behavioral changes.
+4. Do not introduce credential theft, access-control bypass, exploitation, covert tracking, or private-data collection.
+5. Document new environment variables and provider requirements.
+6. Update the changelog for meaningful platform changes.
+
+Please open an issue before large architectural changes so the design can be discussed clearly.
+
+---
+
+## License
+
+NEXUS-OSINT is distributed under the repository's **Sayanox v1.1** license. See [`LICENSE`](./LICENSE) for the complete terms.
+
+---
+
+## Status
+
+NEXUS-OSINT is an actively evolving research and engineering project. Some integrations depend on third-party availability, provider policies, credentials, rate limits, or deployment configuration.
+
+Do not interpret a source appearing in the registry as a guarantee that the source is available, accurate, unrestricted, or suitable for every investigation.
+
+---
 
 <div align="center">
 
-**Sayan**
+### NEXUS-OSINT
 
-[![GitHub](https://img.shields.io/badge/GitHub-sayan9168-181717?style=for-the-badge&logo=github)](https://github.com/sayan9168)
-[![Twitter](https://img.shields.io/badge/Twitter-notfound__sayan-1DA1F2?style=for-the-badge&logo=twitter)](https://twitter.com/notfound_sayan)
-[![Instagram](https://img.shields.io/badge/Instagram-_sayyyyan-E4405F?style=for-the-badge&logo=instagram)](https://instagram.com/_sayyyyan)
-[![Gmail](https://img.shields.io/badge/Gmail-sm6881164@gmail.com-D14836?style=for-the-badge&logo=gmail)](mailto:sm6881164@gmail.com)
+**Public intelligence, connected evidence, explainable investigations.**
 
 </div>
-
----
-
-<div align="center">
-
-**⚡ Built with passion for the OSINT community ⚡**
-
-*If this project helps your research, please consider giving it a ⭐ on GitHub.*
-
-</div>
-```
-
----
-
