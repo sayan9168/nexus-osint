@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.1.0 — Spatial Intelligence Jump
+
+- Added an authenticated public-signal spatial API.
+- Added live USGS earthquake ingestion with bounded caching.
+- Added live OpenSky aircraft telemetry ingestion with bounded caching.
+- Added case-evidence coordinate extraction for geospatial evidence overlays.
+- Added a Three.js 3D globe workspace with orbit, zoom and signal focus interactions.
+- Added layer controls, signal counts, tracked-signal details and shareable view URLs.
+- Added standard/NVG/FLIR/noir visualization presets.
+- Added explicit public-source/authorized-use boundaries and spatial safety disclaimers.
+- Added backend spatial compilation and coordinate-extraction tests.
+
 ## 3.0.0 — Intelligence Platform Jump
 
 - Added global authenticated intelligence search across cases, entities and evidence.
@@ -27,5 +39,3 @@
 - Added versioned investigation import/export bundles.
 - Added CI compile/test/frontend/Docker/dependency-audit stages.
 - Added production security and deployment documentation.
-
-All collection remains restricted to public/authorized defensive research boundaries.
