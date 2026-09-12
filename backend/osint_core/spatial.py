@@ -33,6 +33,11 @@ def _coord(v):
             z=_coord(x)
             if z:return z
     return None
+
+def _coord_from_obj(v):
+    """Backward-compatible coordinate extraction helper."""
+    return _coord(v)
+
 def evidence_points(rows):
     out=[]
     for row in rows:
