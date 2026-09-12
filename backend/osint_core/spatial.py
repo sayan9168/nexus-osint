@@ -16,7 +16,7 @@ def _cached(k):
 def _put(k,v): _CACHE[k]=(time.monotonic(),v); return v
 async def _get(url,params=None):
     async with httpx.AsyncClient(timeout=httpx.Timeout(8,connect=3),follow_redirects=False) as c:
-        r=await c.get(url,params=params,headers={"User-Agent":"NEXUS-OSINT/3.1"}); r.raise_for_status(); return r.json()
+        r=await c.get(url,params=params,headers={"User-Agent":"NEXUS-OSINT/3.4"}); r.raise_for_status(); return r.json()
 def _num(v):
     try:
         x=float(v); return x if math.isfinite(x) else None
@@ -65,7 +65,14 @@ async def _aircraft():
     except Exception:return []
 async def _catalog():
     try:
-        sats=await _get(CELESTRAK_URL,{"GROUP":"active","FORMAT":"JSON"}); sat=[{"id":str(x.get("NORAD_CAT_ID") or x.get("OBJECT_NAME")),"kind":"satellite","label":x.get("OBJECT_NAME"),"source":"CelesTrak","norad_id":x.get("NORAD_CAT_ID"),"inclination":x.get("INCLINATION")} for x in (sats or [])[:500]]
+        sats=await _get(CELESTRAK_URL,{"GROUP":"active","FORMAT":"JSON"}); sat=[]
+        for x in (sats or [])[:500]:
+            row={"id":str(x.get("NORAD_CAT_ID") or x.get("OBJECT_NAME")),"kind":"satellite","label":x.get("OBJECT_NAME"),"source":"CelesTrak","norad_id":x.get("NORAD_CAT_ID"),"inclination":x.get("INCLINATION"),"epoch":x.get("EPOCH"),"mean_motion":x.get("MEAN_MOTION")}
+            # CelesTrak GP JSON may include TLE lines; expose them for client-side
+            # propagation without storing or serving private telemetry.
+            if x.get("TLE_LINE1") and x.get("TLE_LINE2"):
+                row["tle_line1"]=x["TLE_LINE1"];row["tle_line2"]=x["TLE_LINE2"]
+            sat.append(row)
     except Exception:sat=[]
     try:
         d=await _get(LAUNCH_URL,{"limit":100});launch=[]
@@ -85,5 +92,5 @@ async def public_layers():
     cached=_cached("layers-v4")
     if cached is not None:return cached
     eq,ac=await asyncio.gather(_earthquakes(),_aircraft());sat,launch,radio=await _catalog()
-    result={"updated_at":int(time.time()),"layers":{"earthquakes":eq,"aircraft":ac,"satellites":sat,"launches":launch,"radio":radio,"vessels":[],"traffic":[],"cctv":[],"fires":[]},"capabilities":{"vessels":bool(os.getenv("AISSTREAM_API_KEY")),"traffic":bool(os.getenv("NEXUS_TRAFFIC_GEOJSON_URL")),"cctv":bool(os.getenv("NEXUS_CCTV_GEOJSON_URL")),"fires":bool(os.getenv("NASA_FIRMS_API_KEY")),"basemap":True,"cockpit":True,"hud":True,"detection":True,"scene_director":True,"whiteboard":True},"sources":[{"id":"usgs","name":"USGS Earthquakes","status":"live","key_required":False},{"id":"opensky","name":"OpenSky Aircraft","status":"live","key_required":False},{"id":"celestrak","name":"CelesTrak Satellites","status":"live","key_required":False},{"id":"launch-library","name":"Launch Library 2","status":"live","key_required":False},{"id":"radio-browser","name":"Radio Browser","status":"live","key_required":False},{"id":"aisstream","name":"AISStream Vessels","status":"configured" if os.getenv("AISSTREAM_API_KEY") else "optional","key_required":True}],"disclaimer":"Public telemetry may be delayed or incomplete. NEXUS does not provide named-person search, face recognition, private-account access, or safety-critical navigation."}
+    result={"updated_at":int(time.time()),"layers":{"earthquakes":eq,"aircraft":ac,"satellites":sat,"launches":launch,"radio":radio,"vessels":[],"traffic":[],"cctv":[],"fires":[]},"capabilities":{"vessels":bool(os.getenv("AISSTREAM_API_KEY")),"traffic":bool(os.getenv("NEXUS_TRAFFIC_GEOJSON_URL")),"cctv":bool(os.getenv("NEXUS_CCTV_GEOJSON_URL")),"fires":bool(os.getenv("NASA_FIRMS_API_KEY")),"satellite_tle":any(bool(x.get("tle_line1") and x.get("tle_line2")) for x in sat),"basemap":True,"cockpit":True,"hud":True,"detection":True,"scene_director":True,"whiteboard":True},"sources":[{"id":"usgs","name":"USGS Earthquakes","status":"live","key_required":False},{"id":"opensky","name":"OpenSky Aircraft","status":"live","key_required":False},{"id":"celestrak","name":"CelesTrak Satellites","status":"live","key_required":False},{"id":"launch-library","name":"Launch Library 2","status":"live","key_required":False},{"id":"radio-browser","name":"Radio Browser","status":"live","key_required":False},{"id":"aisstream","name":"AISStream Vessels","status":"configured" if os.getenv("AISSTREAM_API_KEY") else "optional","key_required":True}],"disclaimer":"Public telemetry may be delayed or incomplete. NEXUS does not provide named-person search, face recognition, private-account access, or safety-critical navigation."}
     return _put("layers-v4",result)
