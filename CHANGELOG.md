@@ -1,15 +1,13 @@
 # Changelog
 
-## 3.1.1 — Spatial Feature Completion
+## 3.2.0 — Spatial Workspace Integration
 
-- Added CelesTrak active satellite catalog layer.
-- Added Launch Library 2 upcoming launch layer.
-- Added Radio Browser geolocated radio layer.
-- Added capability-gated slots for vessels, traffic, public cameras and fires.
-- Added cockpit/orbit mode, tactical HUD, detection overlay and scene director controls.
-- Added browser canvas whiteboard annotations and a Snow sensor preset.
-- Kept optional provider credentials server-side and never exposed them to the browser.
-- Added expanded spatial compilation/shape tests and documentation.
+- Integrated Spatial Intelligence directly into the authenticated NEXUS investigation dashboard.
+- Added header and sidebar launch controls for the Spatial workspace.
+- Added a case-aware Spatial Intelligence banner to the main investigation workspace.
+- Opening Spatial Intelligence now carries the selected case ID into `/spatial?case=...`.
+- Added a guarded navigation path that asks investigators to select a case before opening case-linked spatial analysis.
+- Preserved the existing authenticated public-source spatial API and 3D globe workflow.
 
 ## 3.1.0 — Spatial Intelligence Jump
 
@@ -36,3 +34,17 @@
 - Added organization and membership foundations for future team collaboration.
 - Enforced server-side case authorization in the durable job engine; client-supplied authorization flags are no longer sufficient.
 - Added V3 schema and compilation coverage.
+
+## 2.0.0 — Investigation Platform
+
+- Added local user registration/login and signed JWT sessions.
+- Added endpoint-level role enforcement for viewer/analyst/admin permissions.
+- Added persistent jobs with retry, cancellation, concurrency bounds and optional Redis/Celery execution.
+- Added richer public DNS records: A, AAAA, MX, NS, TXT, CNAME and CAA.
+- Added structured RDAP metadata extraction.
+- Added stable case-scoped entity fingerprints and relationship merging.
+- Added tamper-evident audit verification.
+- Added functional responsive investigation workspace UI.
+- Added versioned investigation import/export bundles.
+- Added CI compile/test/frontend/Docker/dependency-audit stages.
+- Added production security and deployment documentation.
