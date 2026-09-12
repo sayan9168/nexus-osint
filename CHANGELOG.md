@@ -1,5 +1,19 @@
 # Changelog
 
+## 3.3.0 — Open Public Source Expansion
+
+- Added a bounded public-source adapter registry for the Spatial Intelligence module.
+- Added NASA EONET natural-event signals as live public geospatial data.
+- Added GDELT GEO public-news event signals with bounded 24-hour results.
+- Added OpenStreetMap/Overpass on-demand local map context around a selected signal.
+- Added Nominatim reverse geocoding for selected spatial signals.
+- Added Open-Meteo weather context for selected coordinates without an API key.
+- Added NOAA active weather-alert context for supported US coordinates.
+- Added a public-source registry panel inside the Spatial workspace.
+- Added selected-signal context retrieval so investigators can inspect nearby public map features, weather and public alerts.
+- Added source-registry tests and explicit provider/rate-limit disclaimers.
+- Preserved the existing public/authorized-use boundary: no named-person tracking, face recognition, private-account access or safety-critical navigation.
+
 ## 3.2.0 — Spatial Workspace Integration
 
 - Integrated Spatial Intelligence directly into the authenticated NEXUS investigation dashboard.
