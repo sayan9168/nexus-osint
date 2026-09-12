@@ -3,7 +3,8 @@ from __future__ import annotations
 import hashlib, hmac, os
 from datetime import datetime, timedelta, timezone
 from uuid import uuid4
-from jose import JWTError, jwt
+import jwt
+from jwt import InvalidTokenError
 from .persistence import db, json_dumps
 
 JWT_SECRET = os.getenv("NEXUS_JWT_SECRET", "change-me-in-production")
@@ -44,7 +45,7 @@ def issue_session(user: dict) -> str:
 
 def decode_session(token: str) -> dict:
     try: return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALG])
-    except JWTError as exc: raise ValueError("invalid or expired session") from exc
+    except InvalidTokenError as exc: raise ValueError("invalid or expired session") from exc
 
 def bootstrap_admin() -> None:
     username = os.getenv("NEXUS_BOOTSTRAP_ADMIN")
