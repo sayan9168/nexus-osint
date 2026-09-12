@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.3.1 — Passive Intelligence Expansion
+
+- Added passive certificate-transparency lookups through crt.sh with bounded subdomain results.
+- Added RIPE Atlas public-probe layer for Internet measurement context.
+- Added RIPEstat network metadata lookup for explicitly supplied IP/ASN resources.
+- Added Wikidata public-knowledge lookup for explicitly supplied search terms.
+- Added authenticated `/v3/spatial/passive/certificates` endpoint.
+- Added authenticated `/v3/spatial/passive/network` endpoint.
+- Added authenticated `/v3/spatial/passive/knowledge` endpoint.
+- Kept all passive lookups bounded, read-only and server-side.
+- Maintained the public/authorized boundary: no credential collection, private-account access, named-person tracking, face recognition, exploitation or stealth collection.
+
 ## 3.3.0 — Open Public Source Expansion
 
 - Added a bounded public-source adapter registry for the Spatial Intelligence module.
