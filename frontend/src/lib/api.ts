@@ -1,5 +1,6 @@
 const API=process.env.NEXT_PUBLIC_API_URL||"http://localhost:8000/api/v1";
 export type InvestigationResult={status:string;report:string;entities_found:number;correlations_found:number;transforms_executed:string[]};
+function authHeaders():HeadersInit{const token=typeof window!=="undefined"?localStorage.getItem("nexus_token"):null;if(!token)throw new Error("Authentication required");return {Authorization:`Bearer ${token}`};}
 export async function triggerInvestigation(target:string,goal:string,maxIterations:number):Promise<InvestigationResult>{
  const token=typeof window!=="undefined"?localStorage.getItem("nexus_token"):null;
  if(!token)throw new Error("Authentication required");
@@ -7,4 +8,10 @@ export async function triggerInvestigation(target:string,goal:string,maxIteratio
  const data=await response.json().catch(()=>({}));
  if(!response.ok)throw new Error(data.detail||`HTTP ${response.status}`);
  return data as InvestigationResult;
+}
+export async function deleteEntity(entityId:string):Promise<{status:string;id:string}>{
+ const response=await fetch(`${API}/entities/${encodeURIComponent(entityId)}`,{method:"DELETE",headers:authHeaders()});
+ const data=await response.json().catch(()=>({}));
+ if(!response.ok)throw new Error(data.detail||`HTTP ${response.status}`);
+ return data as {status:string;id:string};
 }
