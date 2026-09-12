@@ -32,3 +32,15 @@ export const NODE_COLORS: Record<string, string> = {
   SocialHandle: "#34d399",
   DarknetForumPost: "#f97316",
 };
+
+export const NODE_SIZES: Record<string, number> = {
+  Domain: 4,
+  IP: 4,
+  Email: 4,
+  Hash: 3.5,
+  Wallet: 4,
+  Person: 4.5,
+  SocialHandle: 3.5,
+  DarknetForumPost: 3,
+  default: 3.5,
+};
