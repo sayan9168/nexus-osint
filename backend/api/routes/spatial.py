@@ -1,19 +1,29 @@
 """NEXUS public spatial-intelligence API."""
 from __future__ import annotations
-
-from fastapi import APIRouter, Depends, HTTPException
-
+from fastapi import APIRouter, Depends, HTTPException, Query
 from api.security import get_current_user
 from osint_core.persistence import db
 from osint_core.spatial import evidence_points, public_layers
+from osint_core.public_sources import context, public_snapshot
 
 router = APIRouter()
 
-
 @router.get("/layers")
 async def layers(_: dict = Depends(get_current_user)):
-    return await public_layers()
+    base = await public_layers()
+    extra = await public_snapshot()
+    base["layers"].update(extra["layers"])
+    base["sources"] = base.get("sources", []) + extra["sources"]
+    base["updated_at"] = max(base.get("updated_at", 0), extra.get("updated_at", 0))
+    return base
 
+@router.get("/sources")
+async def sources(_: dict = Depends(get_current_user)):
+    return await public_snapshot()
+
+@router.get("/context")
+async def spatial_context(lat: float = Query(..., ge=-90, le=90), lon: float = Query(..., ge=-180, le=180), radius_m: int = Query(3000, ge=250, le=5000), _: dict = Depends(get_current_user)):
+    return await context(lat, lon, radius_m)
 
 @router.get("/cases/{case_id}/points")
 def case_points(case_id: str, _: dict = Depends(get_current_user)):
