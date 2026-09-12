@@ -13,7 +13,7 @@ python-whois==0.9.4
 qdrant-client==1.9.1
 websockets==11.0.3
 python-multipart==0.0.31
-PyJWT==2.10.1
+PyJWT==2.13.0
 passlib[bcrypt]==1.7.4
 structlog==24.2.0
 tenacity==8.4.1
