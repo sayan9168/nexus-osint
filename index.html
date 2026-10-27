@@ -288,11 +288,12 @@ footer{position:relative;z-index:2;border-top:1px solid rgba(0,229,255,.08);back
   <ul class="navlinks" id="navlinks">
     <li><a href="#home" class="active">Home</a></li>
     <li><a href="#capabilities">Capabilities</a></li>
+    <li><a href="#lab">LAB</a></li>
+    <li><a href="#omni">OMNI</a></li>
     <li><a href="#demo">Live Demo</a></li>
     <li><a href="#products">Products</a></li>
     <li><a href="#pricing">Pricing</a></li>
     <li><a href="#security">Security</a></li>
-    <li><a href="#contact">Contact</a></li>
   </ul>
   <div style="display:flex;gap:10px;align-items:center">
     <button class="cta ghost" onclick="toggleCmd(true)" style="padding:9px 11px">⌘ K</button>
@@ -441,6 +442,35 @@ footer{position:relative;z-index:2;border-top:1px solid rgba(0,229,255,.08);back
   <div class="ctaBand reveal" style="margin-top:16px;background:linear-gradient(135deg, rgba(0,229,255,.10), rgba(123,44,255,.12));border-color:rgba(0,229,255,.16)">
     <div><h3>LAB lives inside the workspace</h3><p>Open any case → <b>NEXUS LAB</b> tab → pick a primitive. All APIs at <code style="background:rgba(0,229,255,.08);padding:2px 6px;border-radius:6px;border:1px solid rgba(0,229,255,.14)">/api/v1/v3/lab/*</code>. Bounded, SHA-hashed, reproducible.</p></div>
     <a class="cta" href="#demo">Enter LAB in Workspace →</a>
+  </div>
+</section>
+
+<!-- OMNI — ALL PUBLIC SOURCES -->
+<section id="omni" style="padding-top:72px">
+  <div class="sh reveal"><span class="eyebrow" style="background:linear-gradient(90deg, rgba(0,255,157,.10), rgba(0,229,255,.10));border-color:rgba(0,255,157,.18);color:#7dffc0">⬔ OMNI — ALL PUBLIC SOURCES • 45+ ADAPTERS</span><h2>Every public signal,<br>one bounded query</h2><p>Infrastructure, web, threat, blockchain, social, geo, environment & knowledge — free-tier first, optional keys unlock more. No private access, ever.</p></div>
+  <div class="bento">
+    <div class="card3 reveal" style="grid-column:span 6;background:linear-gradient(180deg, rgba(12,26,46,.96), rgba(8,18,32,.99))"><div class="icon" style="background:rgba(0,229,255,.10)">🛰️</div><h3>Infrastructure • 10 adapters</h3><p>Shodan InternetDB (no key), HackerTarget Reverse IP, IP-API, BGPView IP/ASN, RIPE Atlas / RIPEstat, OpenSky, CelesTrak — all public, bounded.</p><div class="meta"><span>Shodan InternetDB ✓</span><span>IP-API ✓</span><span>BGPView ✓</span><span>RIPE ✓</span></div><div style="margin-top:12px;padding:8px;border-radius:10px;background:#071325;border:1px solid rgba(0,229,255,.12);font-family:'JetBrains Mono';font-size:11px"><span style="color:#7beaff">GET /v3/omni/ip/8.8.8.8</span> → country, isp, asn, peers, hostname, shodan ports <span style="color:var(--g)">✓ 34ms</span></div></div>
+    <div class="card3 reveal" style="grid-column:span 6;background:linear-gradient(180deg, rgba(12,26,46,.96), rgba(8,18,32,.99))"><div class="icon" style="background:rgba(123,44,255,.10)">🌐</div><h3>Web & Archives • 7 adapters</h3><p>crt.sh, Wayback CDX, URLScan, Common Crawl, GitHub Search, OpenCorporates — historical & live web, all free.</p><div class="meta"><span>crt.sh ✓</span><span>Wayback ✓</span><span>URLScan ✓</span><span>GitHub ✓</span></div><div style="margin-top:12px;padding:8px;border-radius:10px;background:#071325;border:1px solid rgba(123,44,255,.14);font-family:'JetBrains Mono';font-size:11px"><span style="color:#c9b6ff">GET /v3/omni/wayback?target=example.com</span> → 80 snapshots <span style="color:var(--g)">✓ 112ms</span></div></div>
+    <div class="card3 reveal"><div class="icon">🛡️</div><h3>Threat Intel • 8</h3><p>URLhaus (host/url), Feodo blocklist, OpenPhish, ThreatFox, AlienVault OTX (opt), AbuseIPDB (opt).</p><div class="meta"><span>URLhaus ✓</span><span>Feodo ✓</span><span>OpenPhish ✓</span></div></div>
+    <div class="card3 reveal"><div class="icon">⛓️</div><h3>Blockchain • 4</h3><p>Blockchair BTC, Blockchain.info, Mempool.space, Etherscan (opt) — public explorers.</p><div class="meta"><span>Blockchair ✓</span><span>Mempool ✓</span><span>Etherscan opt</span></div></div>
+    <div class="card3 reveal"><div class="icon">👥</div><h3>Social & Code • 4</h3><p>GitHub user/repo, Reddit public JSON, Have I Been Pwned k-anon (opt), Mastodon.</p><div class="meta"><span>GitHub ✓</span><span>Reddit ✓</span><span>HIBP opt</span></div></div>
+    <div class="card3 reveal"><div class="icon">🌍</div><h3>Geo & Environment • 10</h3><p>USGS, NASA EONET, GDELT, Overpass/OSM, Nominatim, Open-Meteo, OpenAQ, Open-Elevation, Sunrise.</p><div class="meta"><span>USGS ✓</span><span>Overpass ✓</span><span>OpenAQ ✓</span></div></div>
+    <div class="card3 wide reveal" style="grid-column:span 12;background:linear-gradient(135deg, rgba(0,255,157,.06), rgba(0,229,255,.08));border-color:rgba(0,255,157,.16)">
+      <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:space-between">
+        <div style="display:flex;gap:12px;align-items:center"><div class="icon" style="background:linear-gradient(135deg,#00e5ff,#00ff9d);color:#02070e;border:0">⚡</div><div><h3 style="margin:0">One call, every source — <code style="background:rgba(0,229,255,.08);padding:2px 6px;border-radius:6px;border:1px solid rgba(0,229,255,.14)">POST /v3/omni/query</code></h3><p style="margin-top:4px">Target: domain / ip / url / email / wallet / hash / term → parallel, bounded (≤200), 8s timeout, SHA-hashed.</p></div></div>
+        <div style="font-family:'JetBrains Mono';font-size:10px;padding:6px 10px;border-radius:999px;background:rgba(0,255,157,.10);border:1px solid rgba(0,255,157,.18);color:#7dffc0">45+ adapters • 8 families • free first</div>
+      </div>
+      <div style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;font-family:'JetBrains Mono';font-size:11px">
+        <div style="padding:10px;border-radius:12px;background:#071325;border:1px solid rgba(0,229,255,.12)"><span style="color:#7beaff">POST</span> {target:"8.8.8.8", target_type:"ip"}<br><span style="color:var(--t3)">→ 12 adapters in parallel • 0.64s</span></div>
+        <div style="padding:10px;border-radius:12px;background:#071325;border:1px solid rgba(0,229,255,.12)"><span style="color:#7beaff">GET</span> /catalog → 45 sources<br><span style="color:var(--t3)">family, docs, env, configured ✓/○</span></div>
+        <div style="padding:10px;border-radius:12px;background:#071325;border:1px solid rgba(0,229,255,.12)"><span style="color:#7beaff">GET</span> /overview → feeds<br><span style="color:var(--t3)">Feodo 30 + OpenPhish 30 + mempool</span></div>
+      </div>
+      <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:6px"><span style="font-family:'JetBrains Mono';font-size:10px;padding:5px 8px;border-radius:999px;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.12);color:#8edcff">No bulk download</span><span style="font-family:'JetBrains Mono';font-size:10px;padding:5px 8px;border-radius:999px;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.12);color:#8edcff">8s timeout</span><span style="font-family:'JetBrains Mono';font-size:10px;padding:5px 8px;border-radius:999px;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.12);color:#8edcff">≤200 items</span><span style="font-family:'JetBrains Mono';font-size:10px;padding:5px 8px;border-radius:999px;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.12);color:#8edcff">User-Agent NEXUS-OSINT/4</span><span style="font-family:'JetBrains Mono';font-size:10px;padding:5px 8px;border-radius:999px;background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.14);color:#ffe27a">Optional keys: VIRUSTOTAL_API_KEY, SHODAN_API_KEY, OTX_API_KEY, ABUSEIPDB_API_KEY…</span></div>
+    </div>
+  </div>
+  <div class="ctaBand reveal" style="margin-top:16px">
+    <div><h3>Try OMNI live</h3><p>Open workspace → <b>OMNI</b> tab → catalog + one-click presets. Or call <code style="background:rgba(0,229,255,.08);padding:2px 6px;border-radius:6px;border:1px solid rgba(0,229,255,.14)">/api/v1/v3/omni/catalog</code> without a case.</p></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap"><a class="cta" href="#demo">Open OMNI →</a><a class="cta ghost" href="https://github.com/sayan9168/nexus-osint" target="_blank">View adapters</a></div>
   </div>
 </section>
 

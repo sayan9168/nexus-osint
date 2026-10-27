@@ -4,7 +4,7 @@ import {useRouter} from "next/navigation";
 const API=process.env.NEXT_PUBLIC_API_URL||"http://localhost:8000/api/v1";
 type Case={id:string,name:string,description:string,status:string,workflow:string,authorized:boolean,tags:string[],targets:string[],evidence:any[],notes:any[]};
 async function api(path:string,token:string,options:RequestInit={}){const r=await fetch(API+path,{...options,headers:{"Content-Type":"application/json",Authorization:`Bearer ${token}`,...(options.headers||{})}});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.detail||`HTTP ${r.status}`);return d}
-const TABS=[{id:"overview",label:"Overview",icon:"◈"},{id:"evidence",label:"Evidence",icon:"⬢"},{id:"lab",label:"NEXUS LAB",icon:"⬣",badge:"NEW"},{id:"entities",label:"Entities",icon:"⬡"},{id:"jobs",label:"Jobs",icon:"⚡"},{id:"graph",label:"Graph",icon:"◎"},{id:"timeline",label:"Timeline",icon:"◷"},{id:"score",label:"Score",icon:"◆"},{id:"reports",label:"Reports",icon:"▭"},{id:"audit",label:"Audit",icon:"⬔"},{id:"intel",label:"Intel",icon:"⬢"},{id:"workflow",label:"Workflow",icon:"✦"}] as const;
+const TABS=[{id:"overview",label:"Overview",icon:"◈"},{id:"evidence",label:"Evidence",icon:"⬢"},{id:"lab",label:"NEXUS LAB",icon:"⬣",badge:"NEW"},{id:"omni",label:"OMNI",icon:"⬔",badge:"45+"},{id:"entities",label:"Entities",icon:"⬡"},{id:"jobs",label:"Jobs",icon:"⚡"},{id:"graph",label:"Graph",icon:"◎"},{id:"timeline",label:"Timeline",icon:"◷"},{id:"score",label:"Score",icon:"◆"},{id:"reports",label:"Reports",icon:"▭"},{id:"audit",label:"Audit",icon:"⬔"},{id:"intel",label:"Intel",icon:"⬢"},{id:"workflow",label:"Workflow",icon:"✦"}] as const;
 const LABS=[{id:"prism",label:"Prism Vault",icon:"◆",desc:"Holographic evidence"},{id:"neural",label:"Neural Mesh",icon:"⟁",desc:"Inferred correlations"},{id:"shadow",label:"Shadow 360",icon:"⬢",desc:"6-axis profile"},{id:"prophet",label:"Prophet",icon:"◈",desc:"Causality + forecast"},{id:"quantum",label:"Quantum",icon:"⌖",desc:"NL → graph"}] as const;
 
 export default function Home(){
@@ -20,6 +20,8 @@ export default function Home(){
  const [prophet,setProphet]=useState<any>(null);
  const [quantumQ,setQuantumQ]=useState("who owns this domain and what else is linked?"); const [quantum,setQuantum]=useState<any>(null);
  const [copilotOpen,setCopilotOpen]=useState(false); const [copilotQ,setCopilotQ]=useState("summarize this case"); const [copilotMsgs,setCopilotMsgs]=useState<{q:string,a:string}[]>([]);
+ // OMNI states
+ const [omniCat,setOmniCat]=useState<any>(null); const [omniFilter,setOmniFilter]=useState("all"); const [omniTarget,setOmniTarget]=useState(""); const [omniType,setOmniType]=useState("domain"); const [omniRes,setOmniRes]=useState<any>(null); const [omniBusy,setOmniBusy]=useState(false);
  const targetType=useMemo(()=> target.includes("@")?"email": target.startsWith("http")?"url": /^([0-9]{1,3}\.){3}[0-9]{1,3}$/.test(target.trim())?"ip": target.trim().includes(".")?"domain": "target",[target]);
  const score= useMemo(()=> selected?.evidence?.length? Math.round(selected.evidence.reduce((a:any,e:any)=>a+Number(e.confidence||0),0)/selected.evidence.length*100):0,[selected]);
  useEffect(()=>{const t=localStorage.getItem("nexus_token");if(t){setToken(t);api("/auth/me",t).then(x=>{setUser(x.user);loadCases(t)}).catch(()=>localStorage.removeItem("nexus_token"))}},[]);
@@ -29,7 +31,14 @@ export default function Home(){
  async function addTarget(){if(!selected||!target.trim())return;try{const c=await api(`/cases/${selected.id}/targets`,token,{method:"POST",body:JSON.stringify({target:target.trim()})});setSelected(c);setCases(x=>x.map(v=>v.id===c.id?c:v));setError("")}catch(e:any){setError(e.message)}}
  async function scan(){if(!selected||!target.trim())return;setBusy(true);try{await api("/platform/jobs",token,{method:"POST",body:JSON.stringify({case_id:selected.id,target:target.trim(),target_type:targetType,authorized:true})});await addTarget();setTab("jobs");await pollJobs()}catch(e:any){setError(e.message)}finally{setBusy(false)}}
  async function pollJobs(){try{const d=await api("/platform/jobs",token);setJobs(d.jobs)}catch(e:any){setError(e.message)}}
- async function loadTab(t:string){setTab(t);if(!selected)return;try{if(t==="audit")setAudit((await api("/platform/audit",token)).events);if(t==="jobs")await pollJobs();if(t==="intel"&&target)setIntel(await api("/intelligence/dns-rdap",token,{method:"POST",body:JSON.stringify({domain:target.replace(/^https?:\/\//,"").split("/")[0]})}));if(t==="entities")setEntities((await api(`/intelligence/entities/${selected.id}`,token)).entities||[]);if(t==="workflow")setMeta(await api(`/workflow/${selected.id}/meta`,token));if(t==="lab"){ // preload prism
+ async function loadTab(t:string){setTab(t); try{
+   if(t==="omni"){
+     try{ setOmniCat(await api(`/v3/omni/catalog`,token)); }catch(e:any){setError(e.message)}
+     if(target) setOmniTarget(target);
+     return;
+   }
+   if(!selected) return;
+   if(t==="audit")setAudit((await api("/platform/audit",token)).events);if(t==="jobs")await pollJobs();if(t==="intel"&&target)setIntel(await api("/intelligence/dns-rdap",token,{method:"POST",body:JSON.stringify({domain:target.replace(/^https?:\/\//,"").split("/")[0]})}));if(t==="entities")setEntities((await api(`/intelligence/entities/${selected.id}`,token)).entities||[]);if(t==="workflow")setMeta(await api(`/workflow/${selected.id}/meta`,token));if(t==="lab"){ // preload prism
    try{ setPrism(await api(`/v3/lab/prism/${selected.id}`,token)); }catch{}
    try{ if(!entities.length) setEntities((await api(`/intelligence/entities/${selected.id}`,token)).entities||[]); }catch{}
  }}catch(e:any){setError(e.message)}}
@@ -45,6 +54,8 @@ export default function Home(){
  async function fetchProphet(){if(!selected)return;try{setProphet(await api(`/v3/lab/prophet/${selected.id}?horizon=3`,token))}catch(e:any){setError(e.message)}}
  async function fetchQuantum(){if(!selected||!quantumQ.trim())return;try{setQuantum(await api(`/v3/lab/quantum/${selected.id}`,token,{method:"POST",body:JSON.stringify({query:quantumQ})}))}catch(e:any){setError(e.message)}}
  async function askCopilot(){if(!selected||!copilotQ.trim())return;try{const r=await api(`/v3/lab/copilot/${selected.id}`,token,{method:"POST",body:JSON.stringify({question:copilotQ})}); setCopilotMsgs(m=>[...m,{q:copilotQ,a:r.answer}]); setCopilotQ("")}catch(e:any){setError(e.message)}}
+ async function queryOmni(){if(!omniTarget.trim())return; setOmniBusy(true); try{ const r=await api(`/v3/omni/query`,token,{method:"POST",body:JSON.stringify({target:omniTarget.trim(), target_type:omniType})}); setOmniRes(r);}catch(e:any){setError(e.message)}finally{setOmniBusy(false)}}
+ async function fetchOmniCatalog(){try{setOmniCat(await api(`/v3/omni/catalog`,token))}catch(e:any){setError(e.message)}}
 
  const filteredCases=cases.filter(c=>!q|| c.name.toLowerCase().includes(q.toLowerCase()) || c.id.toLowerCase().includes(q.toLowerCase()));
  const evidenceQ=(selected?.evidence||[]).filter(e=> !q || JSON.stringify(e).toLowerCase().includes(q.toLowerCase()));
@@ -387,6 +398,88 @@ export default function Home(){
                   ))}</div>
                 </div>
               )}
+            </div>
+          )}
+
+          {tab==="omni"&&(
+            <div className="grid gap-4">
+              <div className="rounded-2xl bg-gradient-to-r from-[#00e5ff]/10 via-[#7b2cff]/10 to-transparent border border-[#00e5ff]/15 p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
+                <div><div className="text-[11px] tracking-widest font-mono text-[#00e5ff]">⬔ OMNI — ALL PUBLIC SOURCES • {omniCat?.count||45}+ ADAPTERS</div><div className="font-bold text-[18px] tracking-[-0.02em]">One query, every public source</div><div className="text-sm text-[#8ea6c0]">Infrastructure • Web • Threat • Blockchain • Social • Geo • Environment • Knowledge — bounded, rate-limited, audited.</div></div>
+                <div className="flex gap-2"><button onClick={fetchOmniCatalog} className="px-4 py-2.5 rounded-xl bg-[#0a1830] border border-[#1a3560] text-sm font-bold">Refresh catalog</button><button onClick={()=>{setOmniTarget(target||"8.8.8.8"); setOmniType(targetType)}} className="px-4 py-2.5 rounded-xl bg-white text-[#02070e] font-bold text-sm">Use top bar target →</button></div>
+              </div>
+
+              <div className="rounded-2xl bg-[#0c1a2e] border border-[#142a4a] p-4">
+                <div className="flex flex-wrap gap-2 p-1.5 rounded-2xl bg-[#071325] border border-[#1a3560] items-center">
+                  <select value={omniType} onChange={e=>setOmniType(e.target.value)} className="px-3 py-2 rounded-xl bg-[#0a1830] border border-[#1a3560] text-sm font-mono text-[#7beaff] outline-none">
+                    <option value="domain">domain</option><option value="ip">ip</option><option value="url">url</option><option value="email">email</option><option value="wallet">wallet</option><option value="hash">hash</option><option value="term">term</option>
+                  </select>
+                  <input value={omniTarget} onChange={e=>setOmniTarget(e.target.value)} placeholder="target — e.g. 8.8.8.8 / example.com / bc1q..." className="flex-1 min-w-[180px] bg-transparent px-3 py-2 outline-none text-sm placeholder:text-[#5b7590]"/>
+                  <button onClick={queryOmni} disabled={omniBusy||!omniTarget.trim()} className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#00e5ff] to-[#7b2cff] text-[#02070e] font-extrabold text-sm disabled:opacity-50 shadow-[0_0_18px_rgba(0,229,255,.22)]">{omniBusy?"Querying…":"⚡ Omni Query"}</button>
+                </div>
+                <div className="mt-2 flex flex-wrap gap-1.5 text-[11px] font-mono text-[#5b7590]">
+                  <span>Presets:</span>
+                  {["8.8.8.8","google.com","https://example.com","satoshi@nakamoto.com","1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"].map(s=>(
+                    <button key={s} onClick={()=>{setOmniTarget(s); setOmniType(s.includes("@")?"email": s.startsWith("http")?"url": s.includes(".") && !s.includes("/")?"domain": s.startsWith("1")||s.startsWith("bc1")?"wallet":"term");}} className="px-2 py-1 rounded-full bg-white/5 border border-white/10 hover:text-[#eaf2ff]">{s}</button>
+                  ))}
+                </div>
+              </div>
+
+              {omniRes && (
+                <div className="rounded-2xl bg-[#0c1a2e] border border-[#142a4a] p-4">
+                  <div className="flex flex-wrap gap-2 items-center justify-between"><h3 className="font-bold">⚡ Omni Result — {omniRes.target} <span className="text-xs font-mono px-2 py-1 rounded-full bg-[#00ff9d]/10 border border-[#00ff9d]/20 text-[#7dffc0]">{omniRes.target_type}</span></h3><span className="text-xs font-mono text-[#5b7590]">{omniRes.sources_ok}/{omniRes.sources_queried} ok • {omniRes.elapsed_s}s • hash {omniRes.omni_hash}</span></div>
+                  <div className="mt-4 grid gap-3">
+                    {Object.entries(omniRes.results as any).map(([k,v]:any)=>{
+                      const hasData = v && (Array.isArray(v) ? v.length>0 : (typeof v==="object" && Object.keys(v).length>0 && !v.error && v.status!=="not_configured"));
+                      const isEmptyArray = Array.isArray(v) && v.length===0;
+                      const isNotConfigured = v?.status==="not_configured";
+                      return (
+                        <details key={k} open={hasData && !isEmptyArray} className="group rounded-xl bg-[#071325] border border-[#1a3560] overflow-hidden">
+                          <summary className="p-3 flex items-center gap-3 cursor-pointer list-none">
+                            <span className={`w-2 h-2 rounded-full ${hasData?"bg-[#00ff9d] shadow-[0_0_8px_#00ff9d]": isNotConfigured?"bg-[#ffd600]":"bg-[#5b7590]"}`}/>
+                            <b className="font-mono text-sm">{k}</b>
+                            <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[#8ea6c0]">{Array.isArray(v)? `${v.length} items` : v?.status || (v&&Object.keys(v).length? "object" : "empty")}</span>
+                            <span className="ml-auto text-xs text-[#5b7590] group-open:rotate-180 transition">▼</span>
+                          </summary>
+                          <div className="px-3 pb-3">
+                            {isNotConfigured ? <div className="text-xs text-[#ffe27a] bg-[#ffd600]/10 border border-[#ffd600]/20 p-2 rounded-lg">Optional key not configured — set {omniCat?.sources?.find((s:any)=>s.id===k.replace("_","-"))?.env || "env"} to unlock.</div>
+                            : Array.isArray(v) ? (
+                              <div className="grid gap-1.5 max-h-[260px] overflow-auto pr-1">
+                                {v.slice(0,20).map((x:any,i:number)=>(
+                                  <div key={i} className="p-2 rounded-lg bg-[#0c1a2e] border border-[#1a3560]/60 font-mono text-xs text-[#cfe0f2] overflow-auto"><pre className="whitespace-pre-wrap break-all text-[11px] leading-5">{JSON.stringify(x,null,2).slice(0,800)}</pre></div>
+                                ))}
+                                {v.length===0&&<div className="text-xs text-[#5b7590]">No results (bounded, public).</div>}
+                              </div>
+                            ) : (
+                              <pre className="p-2 rounded-lg bg-[#0c1a2e] border border-[#1a3560] text-[11px] font-mono text-[#cfe0f2] overflow-auto max-h-[260px] whitespace-pre-wrap break-all">{JSON.stringify(v,null,2).slice(0,4000)}</pre>
+                            )}
+                          </div>
+                        </details>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
+              <div className="rounded-2xl bg-[#0c1a2e] border border-[#142a4a] p-4">
+                <div className="flex flex-wrap gap-2 items-center justify-between"><h3 className="font-bold">📚 Source Catalog — {omniCat?.count||"—"} adapters</h3>
+                  <div className="flex gap-1.5 overflow-auto">
+                    {["all","infrastructure","web","threat","blockchain","social","environment","geo","knowledge"].map(f=>(
+                      <button key={f} onClick={()=>setOmniFilter(f)} className={`px-2.5 py-1 rounded-full border text-xs font-mono capitalize ${omniFilter===f?"bg-[#00e5ff]/15 border-[#00e5ff]/30 text-[#7beaff]":"bg-white/5 border-white/10 text-[#8ea6c0]"}`}>{f}</button>
+                    ))}
+                  </div>
+                </div>
+                {!omniCat ? <div className="mt-4 p-10 text-center rounded-xl bg-[#071325] border border-dashed border-[#1a3560] text-[#8ea6c0]">Click Refresh catalog to load all 45+ public sources.</div> :
+                <div className="mt-4 grid md:grid-cols-2 xl:grid-cols-3 gap-2.5 max-h-[520px] overflow-auto pr-1">
+                  {omniCat.sources.filter((s:any)=> omniFilter==="all" || s.family===omniFilter || s.id.includes(omniFilter)).map((s:any)=>(
+                    <div key={s.id} className={`p-3 rounded-xl border flex gap-3 ${s.configured?"bg-[#071325] border-[#1a3560]":"bg-[#071325]/60 border-dashed border-[#1a3560]/60"}`}>
+                      <span className={`w-8 h-8 rounded-lg grid place-items-center text-xs border shrink-0 ${s.configured?"bg-[#00ff9d]/10 border-[#00ff9d]/20 text-[#7dffc0]":"bg-[#ffd600]/10 border-[#ffd600]/20 text-[#ffe27a]"}`}>{s.configured?"✓":"○"}</span>
+                      <div className="min-w-0"><div className="font-bold text-sm leading-none truncate">{s.name}</div><div className="text-[11px] font-mono text-[#8ea6c0]">{s.family} • {s.id} • {s.key_required?"optional key":"free"}</div><div className="text-[11px] text-[#5b7590] truncate">{s.docs}</div>{s.env&&<div className="text-[10px] font-mono text-[#5b7590]">env: {s.env} {s.configured?"●":"○"}</div>}</div>
+                      <span className={`ml-auto text-[10px] px-1.5 py-0.5 rounded-full border font-mono h-fit ${s.configured?"bg-[#00ff9d]/10 border-[#00ff9d]/20 text-[#7dffc0]":"bg-white/5 border-white/10 text-[#8ea6c0]"}`}>{s.configured?"ready":"optional"}</span>
+                    </div>
+                  ))}
+                </div>}
+                <div className="mt-3 text-[11px] font-mono text-[#5b7590]">All adapters are public/free-tier, bounded (≤200), 6-8s timeout, User-Agent: NEXUS-OSINT/4. Optional keys unlock full data without changing public boundary.</div>
+              </div>
             </div>
           )}
 
