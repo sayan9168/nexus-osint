@@ -20,15 +20,15 @@
     "react-force-graph-3d": "1.29.2",
     "satellite.js": "6.0.1",
     "tailwind-merge": "2.6.0",
-    "three": "0.165.0",
+    "three": "0.186.1",
     "zustand": "5.0.16"
   },
   "devDependencies": {
     "@types/node": "24.10.1",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
-    "@types/three": "0.165.0",
-    "autoprefixer": "10.4.21",
+    "@types/three": "0.186.0",
+    "autoprefixer": "10.6.2",
     "eslint": "9.39.5",
     "eslint-config-next": "16.4.3",
     "postcss": "^8.5.32",
