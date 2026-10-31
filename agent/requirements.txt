@@ -1,5 +1,5 @@
 langgraph==0.1.5
-langchain==0.2.5
+langchain==1.4.7
 langchain-openai==0.1.9
 langchain-community==0.2.5
 openai==1.35.3
