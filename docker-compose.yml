@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   # ─── Memgraph (In-Memory Graph DB) ───
   memgraph:
@@ -160,6 +158,9 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      # Dev target keeps the full dependency tree (incl. devDependencies) so
+      # `npm run dev` works against the bind-mounted source.
+      target: deps
     container_name: nexus-frontend
     ports:
       - "3001:3000"

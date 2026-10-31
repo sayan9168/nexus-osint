@@ -1,0 +1,188 @@
+name: NEXUS-OSINT CI
+
+on:
+  push:
+    branches: [main, 'arena/**']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Least privilege by default; jobs opt into anything extra.
+permissions:
+  contents: read
+
+# A newer commit on the same ref makes the older run obsolete.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '22'
+  PIP_DISABLE_PIP_VERSION_CHECK: '1'
+  PYTHONUNBUFFERED: '1'
+  NEXT_TELEMETRY_DISABLED: '1'
+
+jobs:
+  backend:
+    name: backend
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v7
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pytest pip-audit
+
+      - name: Byte-compile sources
+        run: python -m compileall -q .
+
+      - name: Tests
+        run: pytest -q
+
+      - name: Dependency audit (fails on known CVEs)
+        run: pip-audit -r requirements.txt --progress-spinner off
+
+  frontend:
+    name: frontend
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Dependency audit (production deps)
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Dependency audit (all deps)
+        run: npm audit --audit-level=high
+
+  agent:
+    name: agent
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: agent
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v7
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: agent/requirements.txt
+
+      - name: Byte-compile sources
+        run: python -m compileall -q .
+
+      - name: Dependency graph resolves
+        run: |
+          python -m pip install --upgrade pip
+          pip install --dry-run --quiet -r requirements.txt
+
+  docker:
+    name: docker
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Validate docker-compose manifests
+        run: |
+          docker compose -f docker-compose.yml config --quiet
+          cp .env.example .env
+          docker compose -f docker-compose.production.yml --env-file .env config --quiet
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build backend image
+        uses: docker/build-push-action@v7
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: false
+          tags: nexus-osint-backend:ci
+          cache-from: type=gha,scope=backend
+          cache-to: type=gha,mode=max,scope=backend
+
+      - name: Build frontend image
+        uses: docker/build-push-action@v7
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: false
+          tags: nexus-osint-frontend:ci
+          build-args: |
+            NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+            NEXT_PUBLIC_WS_URL=ws://localhost:8000
+          cache-from: type=gha,scope=frontend
+          cache-to: type=gha,mode=max,scope=frontend
+
+  # Single required status check for branch protection: add "CI gate" as the
+  # required check and future jobs are covered automatically via `needs`.
+  ci-gate:
+    name: CI gate
+    if: always()
+    needs: [backend, frontend, agent, docker]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify every required job succeeded
+        if: needs.backend.result != 'success' || needs.frontend.result != 'success' || needs.agent.result != 'success' || needs.docker.result != 'success'
+        run: |
+          echo "backend=${{ needs.backend.result }}"
+          echo "frontend=${{ needs.frontend.result }}"
+          echo "agent=${{ needs.agent.result }}"
+          echo "docker=${{ needs.docker.result }}"
+          exit 1
+
+      - name: All required jobs passed
+        run: echo "Backend, frontend, agent and Docker checks passed."

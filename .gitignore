@@ -28,6 +28,8 @@ eggs/
 .eggs/
 lib/
 lib64/
+# the frontend keeps real source under src/lib
+!frontend/src/lib/
 parts/
 sdist/
 var/

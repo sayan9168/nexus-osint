@@ -1,37 +1,38 @@
 {
   "name": "nexus-osint-frontend",
-  "version": "3.5.1",
+  "version": "3.6.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "3d-force-graph": "1.73.3",
+    "3d-force-graph": "1.80.1",
     "axios": "^1.21.0",
     "clsx": "2.1.1",
-    "lucide-react": "0.395.0",
-    "next": "14.2.35",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
-    "react-force-graph-3d": "1.24.3",
+    "lucide-react": "1.65.0",
+    "next": "16.4.3",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "react-force-graph-3d": "1.29.2",
     "satellite.js": "6.0.1",
-    "tailwind-merge": "2.3.0",
+    "tailwind-merge": "2.6.0",
     "three": "0.165.0",
-    "zustand": "4.5.2"
+    "zustand": "5.0.16"
   },
   "devDependencies": {
-    "@types/node": "20.14.2",
-    "@types/react": "18.3.3",
-    "@types/react-dom": "18.3.0",
+    "@types/node": "24.10.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
     "@types/three": "0.165.0",
-    "autoprefixer": "10.4.19",
-    "eslint": "8.57.0",
-    "eslint-config-next": "14.2.35",
+    "autoprefixer": "10.4.21",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.4.3",
     "postcss": "^8.5.32",
-    "tailwindcss": "3.4.4",
-    "typescript": "5.4.5"
+    "tailwindcss": "3.4.19",
+    "typescript": "5.9.3"
   }
 }
