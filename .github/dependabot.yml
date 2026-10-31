@@ -1,0 +1,78 @@
+version: 2
+updates:
+  # GitHub Actions used by the workflows above.
+  - package-ecosystem: github-actions
+    directory: '/'
+    schedule:
+      interval: weekly
+      day: monday
+      time: '04:00'
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: 'ci'
+    groups:
+      actions:
+        patterns: ['*']
+
+  # Python backend dependencies.
+  - package-ecosystem: pip
+    directory: '/backend'
+    schedule:
+      interval: weekly
+      day: monday
+      time: '04:15'
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: 'deps(backend)'
+    groups:
+      python:
+        patterns: ['*']
+        update-types: ['minor', 'patch']
+
+  # Frontend npm dependencies.
+  - package-ecosystem: npm
+    directory: '/frontend'
+    schedule:
+      interval: weekly
+      day: monday
+      time: '04:30'
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: 'deps(frontend)'
+    groups:
+      next:
+        patterns: ['next', 'eslint-config-next', 'react', 'react-dom', '@types/react*']
+      npm-minor:
+        patterns: ['*']
+        update-types: ['minor', 'patch']
+        exclude-patterns: ['next', 'eslint-config-next', 'react', 'react-dom', '@types/react*']
+
+  # Agent service dependencies (if present).
+  - package-ecosystem: pip
+    directory: '/agent'
+    schedule:
+      interval: weekly
+      day: monday
+      time: '04:45'
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: 'deps(agent)'
+
+  # Container base images.
+  - package-ecosystem: docker
+    directory: '/backend'
+    schedule:
+      interval: weekly
+      day: monday
+      time: '05:00'
+    commit-message:
+      prefix: 'deps(docker-backend)'
+
+  - package-ecosystem: docker
+    directory: '/frontend'
+    schedule:
+      interval: weekly
+      day: monday
+      time: '05:15'
+    commit-message:
+      prefix: 'deps(docker-frontend)'

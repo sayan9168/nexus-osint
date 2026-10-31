@@ -1,5 +1,35 @@
 # Changelog
 
+## 3.6.0 — CI/CD Hardening & Dependency Upgrade
+
+### Pipeline
+- Replaced `backend-tests.yml` with a single `ci.yml` (jobs: `backend`, `frontend`, `agent`, `docker`) exposing one `CI gate` status check for branch protection.
+- Upgraded every action: `checkout` v4→v7, `setup-python` v5→v7, `setup-node` v4→v7, `setup-buildx-action` v3→v4, and Docker builds now go through `docker/build-push-action` v7 with GitHub Actions layer caching.
+- Added job timeouts, least-privilege permissions, `persist-credentials: false`, and cancellation of superseded runs.
+- Added ESLint (`eslint.config.mjs`, flat config), `tsc --noEmit` and blocking `npm audit` (production + full tree at `high`) to the frontend job.
+- Added Docker Compose manifest validation and an agent service job to CI.
+- Added `cd.yml`: tagged releases publish GHCR images with SBOM, provenance attestations and a Trivy scan, then open a GitHub release with generated notes.
+- Added `codeql.yml` (Python + TypeScript, `security-extended`) and `security.yml` (dependency review, weekly audits, advisory agent audit).
+- Added `.github/dependabot.yml` with grouped weekly updates for Actions, pip, npm and Docker images.
+- Added `docs/CI.md` and Makefile `ci` / `audit` targets so the pipeline can be reproduced locally.
+
+### Security
+- `dnspython` 2.6.1 → 2.9.1 (CVE-2026-114605) — this was the failing `pip-audit` step on `main`.
+- `fastapi` 0.111.0 → 0.141.1 and `pydantic` 2.7.4 → 2.13.5 in the agent service, clearing the `starlette` advisories.
+
+### Frontend
+- Next.js 14.2.35 → 16.4.3 with React 18.3.1 → 19.3.1 (clears the critical Next.js advisory), ESLint 9, TypeScript 5.9, PostCSS 8.5.32, `react-force-graph-3d` 1.29.2, `3d-force-graph` 1.80.1, `zustand` 5.0.16, `lucide-react` 1.65.0, Tailwind 3.4.19.
+- Migrated to Turbopack, which is the default bundler in Next.js 16; the old `webpack` externals hook became a `turbopack.resolveAlias` entry.
+- **Fixed Tailwind never compiling** — the repository had no `postcss.config.js`, so `@tailwind` directives were served unprocessed and utility classes such as `bg-nexus-900` did not exist. Adding the PostCSS config emits the real ~36 KB utility stylesheet.
+- Fixed a React 19 `useRef` typing error in `useWebSocket`.
+- `package.json` version bumped to 3.6.0.
+
+### Containers
+- Frontend image is now a multi-stage production build (`node:22-alpine`, Next.js `output: "standalone"`, non-root user, healthcheck) instead of running the dev server.
+- Backend and agent images build dependencies in a builder stage, run as uid 10001, and ship healthchecks; `libpq-dev` and other unused build packages were dropped.
+- Added `.dockerignore` files, pinned `docker-compose.production.yml` images (no more `:latest`), added build args, healthchecks and named volumes, and dropped the obsolete Compose `version` key.
+- Development compose keeps working by targeting the frontend `deps` stage.
+
 ## 3.3.1 — Passive Intelligence Expansion
 
 - Added passive certificate-transparency lookups through crt.sh with bounded subdomain results.

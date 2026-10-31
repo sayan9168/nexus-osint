@@ -625,11 +625,33 @@ Frontend:
 
 ```bash
 cd frontend
-npm install
+npm ci
+npm run lint
+npm run typecheck
 npm run build
 ```
 
-GitHub Actions provides the repository CI workflow for automated validation. A local green build is not a substitute for reviewing deployment configuration, provider limits, and security controls.
+Everything the pipeline runs is available locally:
+
+```bash
+make ci      # backend tests, lint, typecheck, build, compose validation
+make audit   # pip-audit + npm audit
+```
+
+### CI / CD
+
+| Workflow | Trigger | What it does |
+| --- | --- | --- |
+| `NEXUS-OSINT CI` | push, PR, manual | Byte-compile + `pytest` + `pip-audit` (backend), ESLint + `tsc` + `next build` + `npm audit` (frontend), agent compile check, compose validation and cached image builds, funnelled into a single `CI gate` check |
+| `NEXUS-OSINT CD` | tag `v*.*.*` | Publishes backend/frontend images to GHCR with SBOM + provenance, Trivy scan, GitHub release |
+| `CodeQL` | push, PR, weekly | Static analysis for Python and TypeScript |
+| `Security` | PR, weekly | Dependency review, scheduled `pip-audit` / `npm audit`, advisory agent audit |
+
+Dependabot keeps Actions, pip, npm and Docker base images current on a weekly
+schedule. Full details, including the known agent-stack advisory backlog and the
+release procedure, are in [`docs/CI.md`](docs/CI.md).
+
+A green pipeline is not a substitute for reviewing deployment configuration, provider limits, and security controls.
 
 ---
 

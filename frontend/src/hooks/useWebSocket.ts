@@ -8,7 +8,7 @@ const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000";
 
 export function useWebSocket() {
   const wsRef = useRef<WebSocket | null>(null);
-  const reconnectTimeout = useRef<NodeJS.Timeout>();
+  const reconnectTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
   const {
     setGraphData,
     addNode,
