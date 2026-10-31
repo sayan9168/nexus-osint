@@ -75,5 +75,11 @@ variables when building the frontend image.
 ## Automation
 
 `dependabot.yml` opens weekly grouped updates for Actions, pip (backend and
-agent), npm and Docker base images. Dependabot PRs run the full pipeline and
-`dependency-review` before they can merge.
+agent), npm and Docker base images. Dependabot PRs run the full pipeline before
+they can merge.
+
+`dependency-review` additionally requires the repository **dependency graph**
+(Settings → Code security → Dependency graph). It is marked
+`continue-on-error` so a repository setting cannot turn every PR red; the
+scheduled `audits` job remains the hard gate for advisories. Enable the graph
+if you want dependency review to comment on and block individual PRs.

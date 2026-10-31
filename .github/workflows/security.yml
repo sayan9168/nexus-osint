@@ -20,6 +20,10 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # Requires the repository dependency graph (Settings → Code security).
+    # Keep it non-blocking so a repo setting cannot turn every PR red; the
+    # scheduled `audits` job below is the hard gate for advisories.
+    continue-on-error: true
     permissions:
       contents: read
       pull-requests: write
