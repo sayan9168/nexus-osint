@@ -131,6 +131,10 @@ temp/
 qdrant_storage/
 memgraph_data/
 
+# ─── Local runtime data (SQLite case database written by the backend) ───
+backend/data/
+data/nexus.db
+
 # ─── AI / ML Models ───
 models/
 *.onnx

@@ -4,7 +4,16 @@ import { useEffect, useRef, useCallback } from "react";
 import { useGraphStore } from "@/store/graphStore";
 import type { WSMessage, GraphNode, GraphEdge } from "@/lib/types";
 
-const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000";
+// Resolve the graph-stream endpoint. An explicit NEXT_PUBLIC_WS_URL wins;
+// otherwise use the page origin so the app also works behind a proxy/tunnel
+// where only the web port is reachable from the browser.
+const ENV_WS_URL = process.env.NEXT_PUBLIC_WS_URL;
+function resolveWsUrl(): string {
+  if (ENV_WS_URL) return ENV_WS_URL.replace(/\/$/, "");
+  if (typeof window === "undefined") return "";
+  const scheme = window.location.protocol === "https:" ? "wss" : "ws";
+  return `${scheme}://${window.location.host}`;
+}
 
 export function useWebSocket() {
   const wsRef = useRef<WebSocket | null>(null);
@@ -21,7 +30,7 @@ export function useWebSocket() {
   const connect = useCallback(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
 
-    const ws = new WebSocket(`${WS_URL}/ws/graph`);
+    const ws = new WebSocket(`${resolveWsUrl()}/ws/graph`);
     wsRef.current = ws;
 
     ws.onopen = () => {

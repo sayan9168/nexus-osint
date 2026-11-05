@@ -300,6 +300,23 @@ git clone https://github.com/sayan9168/nexus-osint.git
 cd nexus-osint
 ```
 
+### One command (local, no Docker)
+
+```bash
+bash scripts/dev-up.sh     # or: make dev-up
+```
+
+The script creates `backend/.venv`, installs backend and frontend dependencies,
+starts FastAPI on `:8000` and Next.js on `:3000`, and prints the bootstrap login:
+
+| | |
+|---|---|
+| Web app | http://localhost:3000 |
+| API / OpenAPI docs | http://localhost:8000 · `/docs` |
+| Login | `admin` / `nexus-admin-2026` (override with `NEXUS_BOOTSTRAP_ADMIN` / `NEXUS_BOOTSTRAP_PASSWORD`) |
+
+The browser talks to the API through a same-origin proxy (`/api/v1` → `http://127.0.0.1:8000`, configured by `rewrites()` in `frontend/next.config.js` and `NEXUS_BACKEND_URL`), so the app also works behind a tunnel or remote preview. Memgraph and Redis are optional locally: without Memgraph the API logs `app.memgraph_unavailable` at startup and only the Cypher graph endpoints are unavailable — cases, evidence, intelligence, spatial, OMNI and reporting all use the SQLite store.
+
 ### Backend
 
 ```bash

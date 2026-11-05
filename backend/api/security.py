@@ -16,3 +16,6 @@ def require_permission(permission: str):
         if not allowed(user.get("role", ""), permission): raise HTTPException(403, "Insufficient role")
         return user
     return dependency
+
+# Backwards-compatible alias used by the spatial/analytics/omni route modules.
+get_current_user = current_user
