@@ -15,7 +15,15 @@ from osint_core.rbac import allowed
 logger=structlog.get_logger(__name__);settings=get_settings()
 @asynccontextmanager
 async def lifespan(app:FastAPI):
- logger.info("app.starting",version=settings.APP_VERSION);bootstrap_admin();memgraph=await get_memgraph();logger.info("app.memgraph_connected");yield;await memgraph.disconnect();logger.info("app.shutdown_complete")
+ logger.info("app.starting",version=settings.APP_VERSION);bootstrap_admin();memgraph=None
+ try:
+  memgraph=await get_memgraph();logger.info("app.memgraph_connected")
+ except Exception as exc:
+  logger.warning("app.memgraph_unavailable",error=str(exc))
+ yield
+ if memgraph is not None:
+  await memgraph.disconnect()
+ logger.info("app.shutdown_complete")
 app=FastAPI(title=settings.APP_NAME,version=settings.APP_VERSION,description="AI-Native OSINT & 3D Link Analysis Platform",lifespan=lifespan)
 origins=[x.strip() for x in os.getenv("NEXUS_CORS_ORIGINS","http://localhost:3000").split(",") if x.strip()]
 app.add_middleware(CORSMiddleware,allow_origins=origins,allow_credentials=True,allow_methods=["GET","POST","PUT","PATCH","DELETE","OPTIONS"],allow_headers=["Authorization","Content-Type"],max_age=600)

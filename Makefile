@@ -1,4 +1,4 @@
-.PHONY: up down build logs clean restart backend-logs agent-logs frontend-logs memgraph-console \
+.PHONY: up down build logs clean restart dev-up backend-logs agent-logs frontend-logs memgraph-console \
         ci ci-backend ci-frontend ci-agent ci-docker audit
 
 PY ?= python3
@@ -6,6 +6,10 @@ NPM ?= npm
 
 up:
 	docker compose up -d --build
+
+# Run FastAPI + Next.js locally without Docker (one command).
+dev-up:
+	bash scripts/dev-up.sh
 
 down:
 	docker compose down -v
