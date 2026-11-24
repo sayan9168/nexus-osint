@@ -11,7 +11,7 @@ aiohttp==3.14.4
 dnspython==2.9.1
 python-whois==0.9.4
 qdrant-client==1.9.1
-websockets==11.0.3
+websockets==17.3
 python-multipart==0.0.31
 PyJWT==2.15.0
 passlib[bcrypt]==1.7.4
