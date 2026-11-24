@@ -18,7 +18,7 @@
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "react-force-graph-3d": "1.29.2",
-    "satellite.js": "6.0.1",
+    "satellite.js": "7.1.0",
     "tailwind-merge": "2.6.0",
     "three": "0.165.0",
     "zustand": "5.0.16"
